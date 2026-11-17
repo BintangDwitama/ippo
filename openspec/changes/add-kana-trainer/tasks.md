@@ -1,4 +1,4 @@
-﻿## 1. Version control and project setup
+## 1. Version control and project setup
 
 - [x] 1.1 Set the git identity: `user.name` = `BintangDwitama`, `user.email` = `bintangdwitama010516@gmail.com`
 - [x] 1.2 Run `git init` with branch `main`; add a `.gitignore` excluding `.idea/` and `.claude/settings.local.json`; make the first commit containing `openspec/`, `.claude/commands/` and `.claude/skills/`
@@ -12,14 +12,14 @@
 ## 2. Early risk checks
 
 - [ ] 2.1 Spike: play single kana (ã‚, ã‹, ã—, ã¤, ã‚“, ã¯) with `flutter_tts` on the Android phone and judge the quality; record the result in design.md and decide device voice or bundled recordings
-- [ ] 2.2 Spike: verify the Dart `fsrs` package (maintenance, API, intervals for a short good/again sequence look sensible); if unsuitable, plan `Sm2Scheduler` instead and update design.md
+- [x] 2.2 Spike: verify the Dart `fsrs` package (maintenance, API, intervals for a short good/again sequence look sensible); if unsuitable, plan `Sm2Scheduler` instead and update design.md
 
 ## 3. Domain models and scheduler
 
-- [ ] 3.1 Define domain models: `Item`, `KanaPayload`, `Mnemonic`, `Card`, `PromptType`, `SchedulingState`, `Rating`, `ReviewRecord`, `Goal`, `KanaStatus`
-- [ ] 3.2 Define the `Scheduler` interface and implement `FsrsScheduler` (90% retention, time passed in)
-- [ ] 3.3 Unit tests for `FsrsScheduler`: new card is due immediately, good lengthens the interval, again brings it back the same day and increments lapses
-- [ ] 3.4 Create `FakeScheduler` in `test/fakes/`
+- [x] 3.1 Define domain models: `Item`, `KanaPayload`, `Mnemonic`, `Card`, `PromptType`, `SchedulingState`, `Rating`, `ReviewRecord`, `Goal`, `KanaStatus`
+- [x] 3.2 Define the `Scheduler` interface and implement `FsrsScheduler` (90% retention, time passed in)
+- [x] 3.3 Unit tests for `FsrsScheduler`: new card is due immediately, good lengthens the interval, again brings it back the same day and increments lapses
+- [x] 3.4 Create `FakeScheduler` in `test/fakes/`
 
 ## 4. Data layer
 

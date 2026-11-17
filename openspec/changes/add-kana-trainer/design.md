@@ -105,6 +105,8 @@ abstract interface class Scheduler {
 
 Grading is automatic: correct maps to `good`, wrong maps to `again`. The four-button self-rating of Anki is unnecessary for kana, where an answer is plainly right or wrong, and it removes a decision from every card.
 
+Spike result (task 2.2): `fsrs` 2.0.1 is published by the open-spaced-repetition organisation, implements FSRS-6, and takes the review time as a parameter. With default settings a new card reaches the review phase after two good answers, and a wrong answer in review returns the card after 10 minutes. It is suitable; SM-2 is not needed.
+
 Alternative considered: SM-2. It is simpler but schedules more reviews for the same retention. It remains the fallback: if the `fsrs` package proves unsuitable, an `Sm2Scheduler` implementing the same interface replaces it with no other change.
 
 ### 7. Session building is a pure use case

@@ -23,11 +23,11 @@
 
 ## 4. Data layer
 
-- [ ] 4.1 Define the drift database `AppDatabase` (schema version 1) with tables `items`, `mnemonics`, `cards`, `review_records`, `goals`, `settings`, including the unique constraints on `items.key` and `cards(item_id, prompt_type)`
-- [ ] 4.2 Define repository interfaces: `ItemRepository`, `MnemonicRepository`, `CardRepository`, `ReviewRepository`, `GoalRepository`, `SettingsRepository`, `SpeechRepository`, `ReminderRepository`, with `get{Model}Stream` methods where the UI observes data
-- [ ] 4.3 Implement the drift-backed repositories with row-to-domain mappers, including the kana payload mapper
-- [ ] 4.4 Repository tests against an in-memory drift database (create, read, stream updates, persistence of card state and review records)
-- [ ] 4.5 Create fakes for every repository in `test/fakes/`
+- [x] 4.1 Define the drift database `AppDatabase` (schema version 1) with tables `items`, `mnemonics`, `cards`, `review_records`, `goals`, `settings`, including the unique constraints on `items.key` and `cards(item_id, prompt_type)`
+- [x] 4.2 Define repository interfaces: `ItemRepository`, `MnemonicRepository`, `CardRepository`, `ReviewRepository`, `GoalRepository`, `SettingsRepository`, `SpeechRepository`, `ReminderRepository`, with `get{Model}Stream` methods where the UI observes data
+- [x] 4.3 Implement the drift-backed repositories with row-to-domain mappers, including the kana payload mapper
+- [x] 4.4 Repository tests against an in-memory drift database (create, read, stream updates, persistence of card state and review records)
+- [x] 4.5 Create fakes for every repository in `test/fakes/`
 
 ## 5. Kana content
 

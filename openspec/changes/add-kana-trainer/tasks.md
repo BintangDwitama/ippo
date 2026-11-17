@@ -31,10 +31,10 @@
 
 ## 5. Kana content
 
-- [ ] 5.1 Write `assets/seed/kana.json`: 46 hiragana and 46 katakana with romaji, accepted alternative romanisations, gojÅ«on order, and an original default mnemonic each
-- [ ] 5.2 Implement the seed loader (runs on first launch, transactional, safe to run twice) and a test that seeding twice yields exactly 92 items
-- [ ] 5.3 Implement mnemonic editing in `MnemonicRepository`: save learner text, reject blank text, restore default; with tests
-- [ ] 5.4 Implement the `GetKanaStatus` use case (not started, learning, known) with tests
+- [x] 5.1 Write `assets/seed/kana.json`: 46 hiragana and 46 katakana with romaji, accepted alternative romanisations, gojÅ«on order, and an original default mnemonic each
+- [x] 5.2 Implement the seed loader (runs on first launch, transactional, safe to run twice) and a test that seeding twice yields exactly 92 items
+- [x] 5.3 Implement mnemonic editing in `MnemonicRepository`: save learner text, reject blank text, restore default; with tests
+- [x] 5.4 Implement the `GetKanaStatus` use case (not started, learning, known) with tests
 
 ## 6. Speech
 

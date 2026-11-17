@@ -1,5 +1,8 @@
+import 'package:ippo/domain/models/goal.dart';
 import 'package:ippo/domain/models/item.dart';
+import 'package:ippo/domain/models/rating.dart';
 import 'package:ippo/domain/models/review_card.dart';
+import 'package:ippo/domain/models/review_record.dart';
 import 'package:ippo/domain/models/scheduling_state.dart';
 
 /// Test data builders shared by unit tests.
@@ -40,8 +43,11 @@ Item kanaItem({
 }
 
 /// [hiraganaCount] hiragana (ids from 1) followed by [katakanaCount]
-/// katakana (ids from 101). The first [introduced] of the whole list are
-/// marked as introduced at [introducedAt].
+/// katakana (ids from 101), in teaching order. The first [introduced] of
+/// the whole list are marked as introduced at [introducedAt].
+///
+/// The first few of each script are real kana; the rest are placeholders
+/// with unique characters and readings.
 List<Item> kanaItems({
   int hiraganaCount = 12,
   int katakanaCount = 0,
@@ -49,35 +55,27 @@ List<Item> kanaItems({
   DateTime? introducedAt,
 }) {
   final at = introducedAt ?? DateTime(2026);
-  final items = <Item>[
-    for (var i = 0; i < hiraganaCount; i++)
-      kanaItem(
-        id: i + 1,
-        character: _hiragana[i].$1,
-        romaji: _hiragana[i].$2,
-        sortOrder: i,
-      ),
-    for (var i = 0; i < katakanaCount; i++)
-      kanaItem(
-        id: i + 101,
-        character: _katakana[i].$1,
-        romaji: _katakana[i].$2,
-        script: KanaScript.katakana,
-        sortOrder: i + 100,
-      ),
-  ];
+  var position = 0;
+  Item build(int index, KanaScript script) {
+    final real = script == KanaScript.hiragana ? _hiragana : _katakana;
+    final isHiragana = script == KanaScript.hiragana;
+    final item = kanaItem(
+      id: index + (isHiragana ? 1 : 101),
+      character: index < real.length
+          ? real[index].$1
+          : '${isHiragana ? 'h' : 'k'}$index',
+      romaji: index < real.length ? real[index].$2 : 'r$index',
+      script: script,
+      sortOrder: index + (isHiragana ? 0 : 100),
+      introducedAt: position < introduced ? at : null,
+    );
+    position++;
+    return item;
+  }
+
   return [
-    for (var i = 0; i < items.length; i++)
-      i < introduced
-          ? kanaItem(
-              id: items[i].id,
-              character: items[i].kana.character,
-              romaji: items[i].kana.romaji,
-              script: items[i].kana.script,
-              sortOrder: items[i].sortOrder,
-              introducedAt: at,
-            )
-          : items[i],
+    for (var i = 0; i < hiraganaCount; i++) build(i, KanaScript.hiragana),
+    for (var i = 0; i < katakanaCount; i++) build(i, KanaScript.katakana),
   ];
 }
 
@@ -108,5 +106,40 @@ ReviewCard reviewCard({
     reps: reps,
     lapses: lapses,
     consecutiveCorrect: consecutiveCorrect,
+  );
+}
+
+ReviewRecord reviewRecord({
+  required int id,
+  required int cardId,
+  required DateTime reviewedAt,
+  bool wasCorrect = true,
+}) {
+  return ReviewRecord(
+    id: id,
+    cardId: cardId,
+    reviewedAt: reviewedAt,
+    rating: wasCorrect ? Rating.good : Rating.again,
+    wasCorrect: wasCorrect,
+    phaseBefore: CardPhase.review,
+    elapsedDays: 1,
+  );
+}
+
+Goal goal({
+  int id = 1,
+  GoalTargetSet targetSet = GoalTargetSet.hiragana,
+  double targetAccuracy = 0.9,
+  required DateTime createdAt,
+  int deadlineDays = 14,
+  GoalStatus status = GoalStatus.active,
+}) {
+  return Goal(
+    id: id,
+    targetSet: targetSet,
+    targetAccuracy: targetAccuracy,
+    createdAt: createdAt,
+    deadline: DateTime(createdAt.year, createdAt.month, createdAt.day + deadlineDays),
+    status: status,
   );
 }

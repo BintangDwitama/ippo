@@ -117,7 +117,7 @@ Alternative considered: SM-2. It is simpler but schedules more reviews for the s
 2. Take the most overdue cards up to the cap.
 3. Shuffle, then repair the order so that no two consecutive cards share an item, where possible.
 
-A card answered wrongly is reinserted at least three positions later (or at the end). Shuffling across the whole set gives interleaving of scripts and prompt types without separate rules for each. The random source is injected so tests can fix the seed.
+A card answered wrongly is reinserted at least three positions later (or at the end). Only the first attempt at a card in a session is graded and recorded; the repeats are ungraded practice, because the scheduler has already rescheduled the card. Every review record is therefore a first attempt, which is what goal accuracy is measured on. Shuffling across the whole set gives interleaving of scripts and prompt types without separate rules for each. The random source is injected so tests can fix the seed.
 
 ### 8. Lessons and graduation
 
@@ -149,7 +149,7 @@ abstract interface class SpeechRepository {
 
 ### 12. Goals, quota and reminder
 
-`CalculateDailyQuota` is a pure function of kana remaining, days remaining and kana introduced today. The streak is derived from review records and lesson dates, not stored, so it cannot drift out of step. Accuracy for the goal is the share of first-attempt correct answers over the goal's kana in the last 7 days.
+`CalculateDailyQuota` is a pure function of kana remaining, days remaining and kana introduced today. The quota decides whether a lesson is offered, not its size: a lesson is always a full batch of up to five, so kana are taught in their natural rows (あいうえお, かきくけこ). A day can therefore overshoot its quota by a few kana, and the next day's quota drops to match. Without an active goal, lessons run at a default of five new kana a day. The streak is derived from review records and lesson dates, not stored, so it cannot drift out of step. Accuracy for the goal is the share of first-attempt correct answers over the goal's kana in the last 7 days.
 
 The reminder uses `flutter_local_notifications` with a daily repeating schedule, behind a `ReminderRepository`. The Android 13+ notification permission is requested only when the learner turns the reminder on.
 

@@ -38,30 +38,30 @@
 
 ## 6. Speech
 
-- [ ] 6.1 Implement `TtsService` and `TtsSpeechRepository` (Japanese voice detection, speak, stop, new request interrupts the previous one), or the bundled-recordings implementation if task 2.1 decided so
-- [ ] 6.2 Implement the one-time "install a Japanese voice" notice state in `SettingsRepository`
+- [x] 6.1 Implement `TtsService` and `TtsSpeechRepository` (Japanese voice detection, speak, stop, new request interrupts the previous one), or the bundled-recordings implementation if task 2.1 decided so
+- [x] 6.2 Implement the one-time "install a Japanese voice" notice state in `SettingsRepository`
 
 ## 7. Lesson use cases
 
-- [ ] 7.1 Implement `GetNextLesson`: next batch of up to five kana in gojÅ«on order, hiragana before katakana, limited by the remaining daily quota; with tests
-- [ ] 7.2 Implement `BuildChoiceOptions`: one correct option plus three from the same script, preferring introduced kana; with tests including the first lesson
-- [ ] 7.3 Implement `CompleteLesson`: in one transaction mark kana introduced and create both multiple-choice cards per kana; with tests, including that an abandoned lesson writes nothing
+- [x] 7.1 Implement `GetNextLesson`: next batch of up to five kana in gojÅ«on order, hiragana before katakana, limited by the remaining daily quota; with tests
+- [x] 7.2 Implement `BuildChoiceOptions`: one correct option plus three from the same script, preferring introduced kana; with tests including the first lesson
+- [x] 7.3 Implement `CompleteLesson`: in one transaction mark kana introduced and create both multiple-choice cards per kana; with tests, including that an abandoned lesson writes nothing
 
 ## 8. Review use cases
 
-- [ ] 8.1 Implement `CheckTypedAnswer` (case, whitespace, alternative romanisations) with tests
-- [ ] 8.2 Implement `BuildReviewSession` (drop listening cards without a voice, most overdue first up to the cap, interleaved shuffle, no same-kana neighbours, injected random source) with tests
-- [ ] 8.3 Implement `GradeAnswer`: reschedule through `Scheduler`, write the review record, update `consecutive_correct`, create the typed card at three; in one transaction; with tests for graduation and a broken streak
-- [ ] 8.4 Implement in-session requeue of wrongly answered cards and the session summary calculation (count, first-attempt accuracy) with tests
+- [x] 8.1 Implement `CheckTypedAnswer` (case, whitespace, alternative romanisations) with tests
+- [x] 8.2 Implement `BuildReviewSession` (drop listening cards without a voice, most overdue first up to the cap, interleaved shuffle, no same-kana neighbours, injected random source) with tests
+- [x] 8.3 Implement `GradeAnswer`: reschedule through `Scheduler`, write the review record, update `consecutive_correct`, create the typed card at three; in one transaction; with tests for graduation and a broken streak
+- [x] 8.4 Implement in-session requeue of wrongly answered cards and the session summary calculation (count, first-attempt accuracy) with tests
 
 ## 9. Goal use cases
 
-- [ ] 9.1 Implement goal creation and validation (preset, target set, accuracy 50% to 100%, deadline at least one day) with tests
-- [ ] 9.2 Implement `CalculateDailyQuota` with tests for the even pace, falling behind and nothing remaining cases
-- [ ] 9.3 Implement `GetGoalProgress` (introduced count, 7-day first-attempt accuracy, days remaining, achieved or missed) with tests
-- [ ] 9.4 Implement `GetStreak` derived from review records and lesson dates, with tests
-- [ ] 9.5 Implement the daily review cap setting and its use in `BuildReviewSession`
-- [ ] 9.6 Implement `NotificationService` and `ReminderRepository` (daily local notification at a chosen time, permission request on enable, cancel on disable)
+- [x] 9.1 Implement goal creation and validation (preset, target set, accuracy 50% to 100%, deadline at least one day) with tests
+- [x] 9.2 Implement `CalculateDailyQuota` with tests for the even pace, falling behind and nothing remaining cases
+- [x] 9.3 Implement `GetGoalProgress` (introduced count, 7-day first-attempt accuracy, days remaining, achieved or missed) with tests
+- [x] 9.4 Implement `GetStreak` derived from review records and lesson dates, with tests
+- [x] 9.5 Implement the daily review cap setting and its use in `BuildReviewSession`
+- [x] 9.6 Implement `NotificationService` and `ReminderRepository` (daily local notification at a chosen time, permission request on enable, cancel on disable)
 
 ## 10. App shell
 

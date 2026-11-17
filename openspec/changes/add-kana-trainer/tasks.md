@@ -65,25 +65,25 @@
 
 ## 10. App shell
 
-- [ ] 10.1 Wire services, repositories and use cases with `provider` in `main.dart`, using constructor injection
-- [ ] 10.2 Configure `go_router` routes: home, lesson, review, kana grid, kana detail, goal, settings
-- [ ] 10.3 Create the app theme and shared widgets (large kana display with a Japanese-capable font, audio button, choice button, progress bar)
+- [x] 10.1 Wire services, repositories and use cases with `provider` in `main.dart`, using constructor injection
+- [x] 10.2 Configure `go_router` routes: home, lesson, review, kana grid, kana detail, goal, settings
+- [x] 10.3 Create the app theme and shared widgets (large kana display with a Japanese-capable font, audio button, choice button, progress bar)
 
 ## 11. Screens and ViewModels
 
-- [ ] 11.1 Home: `HomeViewModel` and `HomeUiState` (due count, lesson availability, goal progress, streak, next due time) and screen
-- [ ] 11.2 First-launch goal setup: preset offered, adjustable, with validation messages
-- [ ] 11.3 Lesson: `LessonViewModel` with sealed `LessonUiState` (presenting, quiz, feedback, complete) and screen
-- [ ] 11.4 Review: `ReviewViewModel` with sealed `ReviewUiState` (question for each prompt type, feedback, summary) and screen, including the romaji text field for typed cards
-- [ ] 11.5 Kana grid and kana detail: status per kana, script switch, mnemonic edit and restore, audio button
-- [ ] 11.6 Goal screen: progress, edit, achieved and missed states with the offer of a new or extended goal
-- [ ] 11.7 Settings: daily review cap, reminder on/off and time, Japanese voice notice
-- [ ] 11.8 ViewModel unit tests for home, lesson, review, kana detail and goal, using fakes and asserting on `uiState`
+- [x] 11.1 Home: `HomeViewModel` and `HomeUiState` (due count, lesson availability, goal progress, streak, next due time) and screen
+- [x] 11.2 First-launch goal setup: preset offered, adjustable, with validation messages
+- [x] 11.3 Lesson: `LessonViewModel` with sealed `LessonUiState` (presenting, quiz, feedback, complete) and screen
+- [x] 11.4 Review: `ReviewViewModel` with sealed `ReviewUiState` (question for each prompt type, feedback, summary) and screen, including the romaji text field for typed cards
+- [x] 11.5 Kana grid and kana detail: status per kana, script switch, mnemonic edit and restore, audio button
+- [x] 11.6 Goal screen: progress, edit, achieved and missed states with the offer of a new or extended goal
+- [x] 11.7 Settings: daily review cap, reminder on/off and time, Japanese voice notice
+- [x] 11.8 ViewModel unit tests for home, lesson, review, kana detail and goal, using fakes and asserting on `uiState`
 
 ## 12. Verification
 
-- [ ] 12.1 Widget test for navigation between home, lesson, review, kana grid and settings
-- [ ] 12.2 Run `flutter analyze` and `flutter test`; fix all issues
+- [x] 12.1 Widget test for navigation between home, lesson, review, kana grid and settings
+- [x] 12.2 Run `flutter analyze` and `flutter test`; fix all issues
 - [ ] 12.3 Manual run on the Android phone in airplane mode: first launch, goal setup, a lesson, a review session, editing a mnemonic, app restart keeps progress
 - [ ] 12.4 Manual check of the reminder notification and of behaviour when notification permission is refused
 - [ ] 12.5 Build a release APK and confirm it installs and starts

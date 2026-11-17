@@ -1,0 +1,26 @@
+import 'package:flutter/foundation.dart';
+import 'package:ippo/data/repositories/settings_repository.dart';
+import 'package:ippo/domain/models/reminder_time.dart';
+
+@immutable
+class SettingsUiState {
+  const SettingsUiState({
+    this.isLoading = true,
+    this.dailyReviewCap = SettingsRepository.defaultDailyReviewCap,
+    this.reminderTime,
+    this.isReminderPermissionDenied = false,
+    this.isJapaneseVoiceAvailable = true,
+  });
+
+  final bool isLoading;
+  final int dailyReviewCap;
+
+  /// The reminder time; null when the reminder is off.
+  final ReminderTime? reminderTime;
+
+  /// The learner tried to turn the reminder on but refused permission.
+  final bool isReminderPermissionDenied;
+  final bool isJapaneseVoiceAvailable;
+
+  bool get isReminderOn => reminderTime != null;
+}

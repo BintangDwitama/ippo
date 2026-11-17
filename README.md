@@ -1,17 +1,46 @@
-# ippo
+# Ippo (一歩)
 
-Ippo: learn Japanese one step at a time
+A personal app for learning Japanese from zero, one step at a time. The first
+stage is a kana trainer: lessons that introduce hiragana and katakana with
+mnemonics and audio, spaced-repetition reviews, and a goal to keep pace.
 
-## Getting Started
+Built with Flutter, Android first. Everything is stored on the device and
+works offline.
 
-This project is a starting point for a Flutter application.
+## Getting started
 
-A few resources to get you started if this is your first Flutter project:
+```
+flutter pub get
+dart run build_runner build
+flutter run
+```
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+`build_runner` generates the database code (`*.g.dart`), which is not checked
+in. Run it again after changing `lib/data/services/app_database.dart`.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Install the Flutter SDK in a path without spaces. Some dependencies use
+native build hooks that fail otherwise.
+
+## Checks
+
+```
+flutter analyze
+flutter test
+```
+
+## Structure
+
+```
+lib/
+  main.dart               entry point and dependency wiring
+  app_dependencies.dart   repositories and use cases, built once
+  routing/                go_router routes
+  ui/                     screens, one ViewModel and UiState per screen
+  domain/                 models, the scheduler, use cases
+  data/                   repositories, services, seed loader
+assets/seed/kana.json     the 92 kana with readings and mnemonics
+openspec/                 specs, design and tasks for each change
+```
+
+Project standards (layered architecture, naming, testing) are in
+`openspec/config.yaml`.

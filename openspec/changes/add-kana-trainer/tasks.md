@@ -2,7 +2,7 @@
 
 - [x] 1.1 Set the git identity: `user.name` = `BintangDwitama`, `user.email` = `bintangdwitama010516@gmail.com`
 - [x] 1.2 Run `git init` with branch `main`; add a `.gitignore` excluding `.idea/` and `.claude/settings.local.json`; make the first commit containing `openspec/`, `.claude/commands/` and `.claude/skills/`
-- [ ] 1.3 Create a public GitHub repository named `ippo` under the `BintangDwitama` account (on github.com, since the GitHub CLI is not installed), add it as `origin`, and push `main`
+- [x] 1.3 Create a public GitHub repository named `ippo` under the `BintangDwitama` account, add it as `origin`, and push `main`
 - [ ] 1.4 Run `flutter doctor` and fix any Android toolchain issues (Android SDK, `adb` on PATH, a connected device or emulator)
 - [ ] 1.5 Create the Flutter project at the repository root with package name `ippo` and organisation `com.bintangdwitama` (application id `com.bintangdwitama.ippo`; Android and iOS platforms; only Android is built); merge Flutter's generated `.gitignore` with the entries from 1.2 and add `*.g.dart`
 - [ ] 1.6 Add dependencies: `provider`, `go_router`, `drift`, `drift_flutter`, `fsrs`, `flutter_tts`, `flutter_local_notifications`, `timezone`; dev: `drift_dev`, `build_runner`

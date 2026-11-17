@@ -1,0 +1,5 @@
+# IDE state
+.idea/
+
+# Personal Claude Code settings
+.claude/settings.local.json

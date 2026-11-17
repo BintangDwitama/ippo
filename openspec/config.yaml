@@ -1,0 +1,90 @@
+schema: spec-driven
+
+# Project context: shown to AI when creating artifacts.
+context: |
+  ## Product
+  Ippo (一歩, "one step"): a personal mobile app for learning Japanese from zero (reading and speaking).
+  Built on six techniques: spaced repetition, immersion, interleaved practice,
+  mnemonics (keyword and rhyme), SMART short-term goals, and an AI partner
+  provided by the app (text first, voice later).
+  Learning path: stage 0 kana -> stage 1 first words and kanji -> stage 2
+  sentences and grammar -> stage 3 capture from real content.
+  The review database is the AI partner's model of the learner.
+
+  ## Tech stack
+  - Flutter with Dart. Android first; keep iOS possible, do not build for it yet.
+  - Local-first: SQLite on the device. The core works offline. No server.
+  - Network is used only for the AI partner (not part of stage 0).
+  - State management and dependency wiring: ChangeNotifier ViewModels with
+    the `provider` package. Navigation: `go_router`.
+
+  ## Architecture standards
+  Follow SOLID principles and a layered architecture (UI, domain, data),
+  adapted from Google's Android architecture recommendations to Flutter.
+
+  Data layer
+  - Expose all application data through repositories. Create a repository
+    even when it wraps a single data source.
+  - Data sources (database, text-to-speech, AI API, preferences) are only
+    accessed by repositories, never by the UI layer.
+  - Repositories are defined as interfaces; implementations are injected.
+  - Map database row types to domain models; do not leak row types upward.
+
+  Domain layer
+  - Use cases hold business logic reused across ViewModels or too complex
+    for one ViewModel (e.g. the review scheduler, grading a card).
+  - Swappable algorithms (e.g. the spacing scheduler) sit behind interfaces.
+
+  UI layer
+  - Unidirectional data flow: widgets call ViewModel methods; ViewModels
+    publish new state. ViewModels never send one-off events to the UI;
+    handle the event and update state with the result.
+  - One ViewModel per screen. Reusable widgets use plain state holder
+    classes with hoisted state, not ViewModels.
+  - Each ViewModel exposes a single immutable `uiState` (`{Screen}UiState`),
+    holding data, loading and error signals; use a sealed class when the
+    states are mutually exclusive.
+  - ViewModels hold no `BuildContext`, widget, or other framework lifecycle
+    reference. If one seems needed, the logic is in the wrong layer.
+  - Layers communicate with `Future` (async/await) for actions and `Stream`
+    for observed data.
+
+  Dependencies
+  - Constructor injection everywhere. Scope a dependency to the app only
+    when it holds shared mutable state or is expensive to create.
+
+  Testing
+  - Unit tests for ViewModels (including streams), repositories and data
+    sources, and domain use cases.
+  - Widget tests for navigation as regression tests.
+  - Prefer fakes to mocks.
+  - Performance checks use Flutter's `integration_test` profiling.
+
+  Version control
+  - The project is tracked with git on branch `main`, with a public GitHub
+    remote (`origin`). Commit author: BintangDwitama.
+  - Make one commit per completed task group in tasks.md, and push after
+    each commit. Commit messages describe the change in the imperative.
+  - The repository is public: never commit secrets, API keys, keystores,
+    `.env` files, or personal data. Keys are supplied at run time, not in
+    source.
+  - Not tracked: `.idea/`, `.claude/settings.local.json`, build output,
+    and generated `*.g.dart` files (regenerate with `build_runner`).
+
+  Naming
+  - Methods are verb phrases (`gradeCard()`); properties are noun phrases.
+  - Stream-returning methods are named `get{Model}Stream`, plural for lists
+    (`getCardsStream(): Stream<List<Card>>`).
+  - Interface implementations get meaningful names (`OfflineFirstCardRepository`,
+    `InMemoryCardRepository`); use the `Default` prefix when nothing better
+    fits. Fakes use the `Fake` prefix (`FakeCardRepository`).
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always include a "Non-goals" section
+#     tasks:
+#       - Break tasks into chunks of max 2 hours

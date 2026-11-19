@@ -3,11 +3,11 @@
 - [x] 1.1 Set the git identity: `user.name` = `BintangDwitama`, `user.email` = `bintangdwitama010516@gmail.com`
 - [x] 1.2 Run `git init` with branch `main`; add a `.gitignore` excluding `.idea/` and `.claude/settings.local.json`; make the first commit containing `openspec/`, `.claude/commands/` and `.claude/skills/`
 - [x] 1.3 Create a public GitHub repository named `ippo` under the `BintangDwitama` account, add it as `origin`, and push `main`
-- [ ] 1.4 Run `flutter doctor` and fix any Android toolchain issues (Android SDK, `adb` on PATH, a connected device or emulator)
+- [x] 1.4 Run `flutter doctor` and fix any Android toolchain issues (Android SDK, `adb` on PATH, a connected device or emulator)
 - [x] 1.5 Create the Flutter project at the repository root with package name `ippo` and organisation `com.bintangdwitama` (application id `com.bintangdwitama.ippo`; Android and iOS platforms; only Android is built); merge Flutter's generated `.gitignore` with the entries from 1.2 and add `*.g.dart`
 - [x] 1.6 Add dependencies: `provider`, `go_router`, `drift`, `drift_flutter`, `fsrs`, `flutter_tts`, `flutter_local_notifications`, `timezone`; dev: `drift_dev`, `build_runner`
 - [x] 1.7 Create the folder structure from the design (`ui/`, `domain/`, `data/`, `routing/`, `test/fakes/`) and enable strict lints in `analysis_options.yaml`
-- [ ] 1.8 Confirm the empty app builds and runs on the Android device
+- [x] 1.8 Confirm the empty app builds and runs on the Android device
 
 ## 2. Early risk checks
 
@@ -86,4 +86,4 @@
 - [x] 12.2 Run `flutter analyze` and `flutter test`; fix all issues
 - [ ] 12.3 Manual run on the Android phone in airplane mode: first launch, goal setup, a lesson, a review session, editing a mnemonic, app restart keeps progress
 - [ ] 12.4 Manual check of the reminder notification and of behaviour when notification permission is refused
-- [ ] 12.5 Build a release APK and confirm it installs and starts
+- [x] 12.5 Build a release APK and confirm it installs and starts

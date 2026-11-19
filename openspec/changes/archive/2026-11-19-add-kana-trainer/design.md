@@ -145,6 +145,8 @@ abstract interface class SpeechRepository {
 }
 ```
 
+Spike result (task 2.1): on the learner's phone (Samsung SM S731B, Android 16) the device's Japanese voice was judged acceptable for single kana, so device text-to-speech is kept and no recordings are bundled.
+
 `TtsSpeechRepository` uses the device's `ja-JP` voice. The interface exists so that bundled recordings can replace it if the voice is poor for single syllables (see Risks).
 
 ### 12. Goals, quota and reminder

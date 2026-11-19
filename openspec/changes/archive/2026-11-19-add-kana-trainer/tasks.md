@@ -11,7 +11,7 @@
 
 ## 2. Early risk checks
 
-- [ ] 2.1 Spike: play single kana (ã‚, ã‹, ã—, ã¤, ã‚“, ã¯) with `flutter_tts` on the Android phone and judge the quality; record the result in design.md and decide device voice or bundled recordings
+- [x] 2.1 Spike: play single kana (ã‚, ã‹, ã—, ã¤, ã‚“, ã¯) with `flutter_tts` on the Android phone and judge the quality; record the result in design.md and decide device voice or bundled recordings
 - [x] 2.2 Spike: verify the Dart `fsrs` package (maintenance, API, intervals for a short good/again sequence look sensible); if unsuitable, plan `Sm2Scheduler` instead and update design.md
 
 ## 3. Domain models and scheduler
@@ -84,6 +84,6 @@
 
 - [x] 12.1 Widget test for navigation between home, lesson, review, kana grid and settings
 - [x] 12.2 Run `flutter analyze` and `flutter test`; fix all issues
-- [ ] 12.3 Manual run on the Android phone in airplane mode: first launch, goal setup, a lesson, a review session, editing a mnemonic, app restart keeps progress
-- [ ] 12.4 Manual check of the reminder notification and of behaviour when notification permission is refused
+- [x] 12.3 Manual run on the Android phone in airplane mode: first launch, goal setup, a lesson, a review session, editing a mnemonic, app restart keeps progress
+- [x] 12.4 Manual check of the reminder notification and of behaviour when notification permission is refused
 - [x] 12.5 Build a release APK and confirm it installs and starts

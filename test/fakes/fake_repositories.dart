@@ -9,6 +9,7 @@ import 'package:ippo/data/repositories/review_repository.dart';
 import 'package:ippo/data/repositories/settings_repository.dart';
 import 'package:ippo/data/repositories/speech_repository.dart';
 import 'package:ippo/data/repositories/unit_of_work.dart';
+import 'package:ippo/domain/models/appearance_mode.dart';
 import 'package:ippo/domain/models/goal.dart';
 import 'package:ippo/domain/models/item.dart';
 import 'package:ippo/domain/models/mnemonic.dart';
@@ -294,6 +295,24 @@ class FakeSettingsRepository implements SettingsRepository {
   @override
   Future<void> setVoiceNoticeShown() async {
     voiceNoticeShown = true;
+  }
+
+  AppearanceMode appearanceMode = AppearanceMode.automatic;
+  final _appearanceChanges = StreamController<AppearanceMode>.broadcast();
+
+  @override
+  Stream<AppearanceMode> getAppearanceModeStream() async* {
+    yield appearanceMode;
+    yield* _appearanceChanges.stream;
+  }
+
+  @override
+  Future<AppearanceMode> getAppearanceMode() async => appearanceMode;
+
+  @override
+  Future<void> setAppearanceMode(AppearanceMode mode) async {
+    appearanceMode = mode;
+    _appearanceChanges.add(mode);
   }
 }
 

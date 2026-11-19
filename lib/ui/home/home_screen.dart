@@ -3,8 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:ippo/domain/models/goal.dart';
 import 'package:ippo/domain/use_cases/get_goal_progress.dart';
 import 'package:ippo/routing/routes.dart';
-import 'package:ippo/ui/core/app_theme.dart';
-import 'package:ippo/ui/core/widgets.dart';
+import 'package:ippo/ui/core/spacing.dart';
+import 'package:ippo/ui/core/theme/ippo_tokens.dart';
+import 'package:ippo/ui/core/widgets/widgets.dart';
 import 'package:ippo/ui/home/home_ui_state.dart';
 import 'package:ippo/ui/home/home_view_model.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +27,20 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ippo'),
+        title: Semantics(
+          label: 'Ippo',
+          child: ExcludeSemantics(
+            child: Text(
+              '一歩',
+              locale: const Locale('ja'),
+              textScaler: TextScaler.noScaling,
+              style: TextStyle(
+                fontFamily: context.tokens.kanaFontFamily,
+                fontSize: 30,
+              ),
+            ),
+          ),
+        ),
         actions: [
           IconButton(
             tooltip: 'Kana',
@@ -38,6 +52,7 @@ class HomeScreen extends StatelessWidget {
             icon: const Icon(Icons.settings_outlined),
             onPressed: () => _open(context, Routes.settings),
           ),
+          const SizedBox(width: 4),
         ],
       ),
       body: state.isLoading
@@ -49,121 +64,168 @@ class HomeScreen extends StatelessWidget {
                   _VoiceNotice(onDismiss: viewModel.dismissVoiceNotice),
                   Gaps.medium,
                 ],
-                if (state.needsGoalSetup)
+                if (state.needsGoalSetup) ...[
                   _GoalSetupCard(
                     onAccept: viewModel.acceptPresetGoal,
                     onAdjust: () => _open(context, Routes.goal),
-                  )
-                else
-                  _GoalCard(
+                  ),
+                  Gaps.medium,
+                ],
+                _PrimaryActionCard(
+                  state: state,
+                  onStartReview: () => _open(context, Routes.review),
+                  onStartLesson: () => _open(context, Routes.lesson),
+                ),
+                if (state.lessonSize > 0) ...[
+                  Gaps.medium,
+                  _NextLessonCard(
+                    kana: state.nextLessonKana,
+                    // The hero already carries the lesson button when the
+                    // lesson is the primary action.
+                    onStart: state.primaryAction == HomePrimaryAction.review
+                        ? () => _open(context, Routes.lesson)
+                        : null,
+                  ),
+                ],
+                if (!state.needsGoalSetup) ...[
+                  Gaps.medium,
+                  _GoalSummary(
                     goal: state.goal!,
                     progress: state.progress!,
                     streak: state.streak,
                     onTap: () => _open(context, Routes.goal),
                   ),
-                Gaps.medium,
-                _ReviewCard(
-                  state: state,
-                  onStart: () => _open(context, Routes.review),
-                ),
-                Gaps.medium,
-                _LessonCard(
-                  lessonSize: state.lessonSize,
-                  onStart: () => _open(context, Routes.lesson),
-                ),
+                ],
               ],
             ),
     );
   }
 }
 
-class _VoiceNotice extends StatelessWidget {
-  const _VoiceNotice({required this.onDismiss});
+/// The one thing to do next: review, learn, or rest.
+class _PrimaryActionCard extends StatelessWidget {
+  const _PrimaryActionCard({
+    required this.state,
+    required this.onStartReview,
+    required this.onStartLesson,
+  });
 
-  final VoidCallback onDismiss;
+  final HomeUiState state;
+  final VoidCallback onStartReview;
+  final VoidCallback onStartLesson;
+
+  static const _label = 'Today\'s step';
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Card(
-      color: scheme.errorContainer,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'No Japanese voice found',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(color: scheme.onErrorContainer),
-            ),
-            Gaps.small,
-            Text(
-              'To hear the kana, install Japanese in your phone\'s '
-              'text-to-speech settings (Settings > Accessibility > '
-              'Text-to-speech > Install voice data). Lessons and reading '
-              'reviews work without it; listening reviews are paused.',
-              style: TextStyle(color: scheme.onErrorContainer),
-            ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: onDismiss,
-                child: const Text('Got it'),
-              ),
-            ),
-          ],
-        ),
+    final nextDue = state.nextDue;
+    final String waiting;
+    if (state.isReviewCapReached) {
+      waiting =
+          'You have reached today\'s review limit. '
+          'The rest will wait for tomorrow.';
+    } else if (nextDue != null) {
+      waiting =
+          'Nothing to review now. '
+          'Next card ${formatTimeUntil(nextDue, DateTime.now())}.';
+    } else {
+      waiting = 'Your first review cards come from a lesson.';
+    }
+
+    return switch (state.primaryAction) {
+      HomePrimaryAction.review => HeroCard(
+        label: _label,
+        figure: '${state.dueCount}',
+        title: state.dueCount == 1 ? 'card to review' : 'cards to review',
+        actionLabel: 'Start review',
+        onAction: onStartReview,
       ),
-    );
+      HomePrimaryAction.lesson => HeroCard(
+        label: _label,
+        figure: '${state.lessonSize}',
+        title: 'new kana to learn',
+        detail: waiting,
+        actionLabel: 'Start lesson',
+        onAction: onStartLesson,
+      ),
+      HomePrimaryAction.rest => HeroCard(
+        label: _label,
+        title: state.isReviewCapReached
+            ? 'That is enough for today'
+            : 'All done for now',
+        detail: state.isReviewCapReached || nextDue != null
+            ? waiting
+            : 'No new kana for today. Come back tomorrow.',
+      ),
+    };
   }
 }
 
-class _GoalSetupCard extends StatelessWidget {
-  const _GoalSetupCard({required this.onAccept, required this.onAdjust});
+/// The kana the next lesson introduces.
+class _NextLessonCard extends StatelessWidget {
+  const _NextLessonCard({required this.kana, this.onStart});
 
-  final VoidCallback onAccept;
-  final VoidCallback onAdjust;
+  final List<String> kana;
+
+  /// Null when the lesson is started from the primary action instead.
+  final VoidCallback? onStart;
+
+  /// A full lesson; shorter lessons leave empty cells so tiles keep
+  /// their size.
+  static const int _columns = 5;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Set your first goal', style: theme.textTheme.titleLarge),
-            Gaps.small,
-            Text(
-              'Suggested: read all 46 hiragana with 90% accuracy within '
-              '14 days. That is about five new kana a day.',
-              style: theme.textTheme.bodyLarge,
-            ),
-            Gaps.medium,
-            FilledButton(
-              onPressed: onAccept,
-              child: const Text('Start with this goal'),
-            ),
-            Gaps.small,
-            Center(
-              child: TextButton(
-                onPressed: onAdjust,
-                child: const Text('Adjust the goal'),
+    final scheme = theme.colorScheme;
+    return IppoCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 12,
+            children: [
+              Text('Next lesson', style: theme.textTheme.titleMedium),
+              Text(
+                '${kana.length} new kana',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
               ),
-            ),
+            ],
+          ),
+          Gaps.medium,
+          Row(
+            children: [
+              for (var i = 0; i < _columns; i++) ...[
+                if (i > 0) const SizedBox(width: 8),
+                Expanded(
+                  child: i < kana.length
+                      ? KanaTile(
+                          character: kana[i],
+                          background: scheme.secondaryContainer,
+                          foreground: scheme.onSecondaryContainer,
+                        )
+                      : const SizedBox.shrink(),
+                ),
+              ],
+            ],
+          ),
+          if (onStart != null) ...[
+            Gaps.medium,
+            SecondaryButton(label: 'Start lesson', onPressed: onStart),
           ],
-        ),
+        ],
       ),
     );
   }
 }
 
-class _GoalCard extends StatelessWidget {
-  const _GoalCard({
+/// Goal progress and the streak, side by side.
+class _GoalSummary extends StatelessWidget {
+  const _GoalSummary({
     required this.goal,
     required this.progress,
     required this.streak,
@@ -178,149 +240,143 @@ class _GoalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final muted = theme.textTheme.bodyMedium?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
     final accuracy = progress.accuracy;
+    final target = (goal.targetAccuracy * 100).round();
     final headline = switch (progress.status) {
       GoalStatus.achieved => 'Goal achieved',
       GoalStatus.missed => 'Goal deadline passed',
-      GoalStatus.active => progress.daysRemaining == 0
-          ? 'Last day of your goal'
-          : '${progress.daysRemaining} days left',
+      GoalStatus.active =>
+        progress.daysRemaining == 0
+            ? 'Last day of your goal'
+            : '${progress.daysRemaining} days left',
     };
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: IppoCard(
+              onTap: onTap,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Expanded(
-                    child: Text(headline, style: theme.textTheme.titleLarge),
+                  Text(headline, style: theme.textTheme.titleMedium),
+                  Gaps.small,
+                  ProgressMeter(
+                    value: progress.totalCount == 0
+                        ? 0
+                        : progress.introducedCount / progress.totalCount,
                   ),
-                  Icon(
-                    Icons.local_fire_department,
-                    color: streak > 0
-                        ? theme.colorScheme.tertiary
-                        : theme.colorScheme.outline,
+                  Gaps.small,
+                  Text(
+                    '${progress.introducedCount} of ${progress.totalCount} '
+                    'kana introduced',
+                    style: muted,
                   ),
-                  Text(' $streak', style: theme.textTheme.titleMedium),
+                  Text(
+                    accuracy == null
+                        ? 'No reviews yet, target $target%'
+                        : 'Accuracy ${(accuracy * 100).round()}%, '
+                              'target $target%',
+                    style: muted,
+                  ),
+                  if (progress.status != GoalStatus.active) ...[
+                    Gaps.small,
+                    Text(
+                      progress.status == GoalStatus.achieved
+                          ? 'Tap to set your next goal.'
+                          : 'Tap to extend it or set a new one.',
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ],
                 ],
               ),
-              Gaps.medium,
-              LinearProgressIndicator(
-                value: progress.totalCount == 0
-                    ? 0
-                    : progress.introducedCount / progress.totalCount,
-                minHeight: 10,
-                borderRadius: BorderRadius.circular(5),
-              ),
-              Gaps.small,
-              Text(
-                '${progress.introducedCount} of ${progress.totalCount} '
-                'kana introduced',
-              ),
-              Text(
-                accuracy == null
-                    ? 'Accuracy: no reviews in the last 7 days '
-                        '(target ${(goal.targetAccuracy * 100).round()}%)'
-                    : 'Accuracy: ${(accuracy * 100).round()}% '
-                        '(target ${(goal.targetAccuracy * 100).round()}%)',
-              ),
-              if (progress.status != GoalStatus.active) ...[
-                Gaps.small,
-                Text(
-                  progress.status == GoalStatus.achieved
-                      ? 'Tap to set your next goal.'
-                      : 'Tap to extend it or set a new one.',
-                  style: TextStyle(color: theme.colorScheme.primary),
-                ),
-              ],
-            ],
+            ),
           ),
-        ),
+          const SizedBox(width: 12),
+          Center(child: StreakBadge(days: streak)),
+        ],
       ),
     );
   }
 }
 
-class _ReviewCard extends StatelessWidget {
-  const _ReviewCard({required this.state, required this.onStart});
+class _VoiceNotice extends StatelessWidget {
+  const _VoiceNotice({required this.onDismiss});
 
-  final HomeUiState state;
-  final VoidCallback onStart;
+  final VoidCallback onDismiss;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final nextDue = state.nextDue;
-    final String detail;
-    if (state.dueCount > 0) {
-      detail = state.dueCount == 1
-          ? '1 card is due'
-          : '${state.dueCount} cards are due';
-    } else if (state.isReviewCapReached) {
-      detail = 'You have reached today\'s review limit. '
-          'The rest will wait for tomorrow.';
-    } else if (nextDue != null) {
-      detail =
-          'Nothing due. Next card ${formatTimeUntil(nextDue, DateTime.now())}.';
-    } else {
-      detail = 'Nothing to review yet. Take a lesson to get started.';
-    }
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Review', style: theme.textTheme.titleLarge),
-            Gaps.small,
-            Text(detail, style: theme.textTheme.bodyLarge),
-            Gaps.medium,
-            FilledButton(
-              onPressed: state.dueCount > 0 ? onStart : null,
-              child: const Text('Start review'),
+    final tokens = context.tokens;
+    final textTheme = Theme.of(context).textTheme;
+    return IppoCard(
+      color: tokens.wrong,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'No Japanese voice found',
+            style: textTheme.titleMedium?.copyWith(color: tokens.onWrong),
+          ),
+          Gaps.small,
+          Text(
+            'To hear the kana, install Japanese in your phone\'s '
+            'text-to-speech settings (Settings > Accessibility > '
+            'Text-to-speech > Install voice data). Lessons and reading '
+            'reviews work without it; listening reviews are paused.',
+            style: textTheme.bodyMedium?.copyWith(color: tokens.onWrong),
+          ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              style: TextButton.styleFrom(foregroundColor: tokens.onWrong),
+              onPressed: onDismiss,
+              child: const Text('Got it'),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _LessonCard extends StatelessWidget {
-  const _LessonCard({required this.lessonSize, required this.onStart});
+class _GoalSetupCard extends StatelessWidget {
+  const _GoalSetupCard({required this.onAccept, required this.onAdjust});
 
-  final int lessonSize;
-  final VoidCallback onStart;
+  final VoidCallback onAccept;
+  final VoidCallback onAdjust;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Lesson', style: theme.textTheme.titleLarge),
-            Gaps.small,
-            Text(
-              lessonSize > 0
-                  ? 'Learn $lessonSize new kana'
-                  : 'No new kana for today. Come back tomorrow.',
-              style: theme.textTheme.bodyLarge,
+    return IppoCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Set your first goal', style: theme.textTheme.titleLarge),
+          Gaps.small,
+          Text(
+            'Suggested: read all 46 hiragana with 90% accuracy within '
+            '14 days. That is about five new kana a day.',
+            style: theme.textTheme.bodyLarge,
+          ),
+          Gaps.medium,
+          SecondaryButton(label: 'Start with this goal', onPressed: onAccept),
+          Gaps.small,
+          Center(
+            child: TextButton(
+              onPressed: onAdjust,
+              child: const Text('Adjust the goal'),
             ),
-            Gaps.medium,
-            FilledButton.tonal(
-              onPressed: lessonSize > 0 ? onStart : null,
-              child: const Text('Start lesson'),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:ippo/data/repositories/settings_repository.dart';
+import 'package:ippo/domain/models/appearance_mode.dart';
 import 'package:ippo/domain/models/reminder_time.dart';
 
 @immutable
@@ -10,6 +11,7 @@ class SettingsUiState {
     this.reminderTime,
     this.isReminderPermissionDenied = false,
     this.isJapaneseVoiceAvailable = true,
+    this.appearanceMode = AppearanceMode.automatic,
   });
 
   final bool isLoading;
@@ -21,6 +23,7 @@ class SettingsUiState {
   /// The learner tried to turn the reminder on but refused permission.
   final bool isReminderPermissionDenied;
   final bool isJapaneseVoiceAvailable;
+  final AppearanceMode appearanceMode;
 
   bool get isReminderOn => reminderTime != null;
 }

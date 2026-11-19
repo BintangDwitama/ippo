@@ -72,3 +72,24 @@ flutter:
 
   assets:
     - assets/seed/kana.json
+    - assets/fonts/licenses/
+
+  # Bundled so the app looks the same offline. The Latin families are
+  # variable fonts; text styles select the weight with a font variation.
+  fonts:
+    - family: Klee One
+      fonts:
+        - asset: assets/fonts/KleeOne-SemiBold.ttf
+          weight: 600
+    - family: Plus Jakarta Sans
+      fonts:
+        - asset: assets/fonts/PlusJakartaSans.ttf
+    - family: Space Grotesk
+      fonts:
+        - asset: assets/fonts/SpaceGrotesk.ttf
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter.ttf
+    - family: Source Serif 4
+      fonts:
+        - asset: assets/fonts/SourceSerif4.ttf

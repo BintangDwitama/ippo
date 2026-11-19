@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ippo/domain/models/goal.dart';
 import 'package:ippo/domain/models/review_card.dart';
+import 'package:ippo/ui/home/home_ui_state.dart';
 import 'package:ippo/ui/home/home_view_model.dart';
 
 import '../support/builders.dart';
@@ -176,5 +177,65 @@ void main() {
     expect((await deps.goals.getCurrentGoal())!.status, GoalStatus.missed);
     expect(viewModel.uiState.goal!.status, GoalStatus.missed);
     expect(viewModel.uiState.progress!.status, GoalStatus.missed);
+  });
+
+  group('primaryAction', () {
+    test('is review when cards are due, even if a lesson is available', () {
+      const state = HomeUiState(
+        isLoading: false,
+        dueCount: 12,
+        nextLessonKana: ['た', 'ち', 'つ', 'て', 'と'],
+      );
+
+      expect(state.primaryAction, HomePrimaryAction.review);
+    });
+
+    test('is lesson when nothing is due and a lesson is available', () {
+      const state = HomeUiState(
+        isLoading: false,
+        nextLessonKana: ['た', 'ち', 'つ', 'て', 'と'],
+      );
+
+      expect(state.primaryAction, HomePrimaryAction.lesson);
+      expect(state.lessonSize, 5);
+    });
+
+    test('is rest when nothing is due and no lesson is available', () {
+      const state = HomeUiState(isLoading: false);
+
+      expect(state.primaryAction, HomePrimaryAction.rest);
+    });
+
+    test('is rest when the review cap hides the due cards', () {
+      const state = HomeUiState(isLoading: false, isReviewCapReached: true);
+
+      expect(state.primaryAction, HomePrimaryAction.rest);
+    });
+  });
+
+  test('lists the kana of the next lesson in teaching order', () async {
+    final viewModel = await create(
+      FakeDependencies(
+        items: kanaItems(hiraganaCount: 12, introduced: 5),
+        goal: goal(createdAt: now),
+        now: now,
+      ),
+    );
+
+    expect(viewModel.uiState.nextLessonKana, ['か', 'き', 'く', 'け', 'こ']);
+    expect(viewModel.uiState.primaryAction, HomePrimaryAction.lesson);
+  });
+
+  test('offers reviews first once cards are due', () async {
+    final viewModel = await create(
+      FakeDependencies(
+        items: kanaItems(hiraganaCount: 12, introduced: 1),
+        cards: [reviewCard(id: 1, itemId: 1, due: now.toUtc())],
+        goal: goal(createdAt: now),
+        now: now,
+      ),
+    );
+
+    expect(viewModel.uiState.primaryAction, HomePrimaryAction.review);
   });
 }

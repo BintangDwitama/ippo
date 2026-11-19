@@ -23,7 +23,8 @@ void main() {
 
     expect(find.text('Set your first goal'), findsNothing);
     expect(find.text('14 days left'), findsOneWidget);
-    expect(find.text('Learn 5 new kana'), findsOneWidget);
+    expect(find.text('new kana to learn'), findsOneWidget);
+    expect(find.text('あ'), findsOneWidget);
   });
 
   testWidgets('a lesson runs from the home screen and back', (tester) async {
@@ -75,11 +76,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(await deps.cards.getCards(), hasLength(10));
-    expect(find.text('10 cards are due'), findsOneWidget);
+    expect(find.text('10'), findsOneWidget);
+    expect(find.text('cards to review'), findsOneWidget);
 
     await tester.tap(find.text('Start review'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('Review  0 / 10'), findsOneWidget);
+    expect(find.text('0 / 10'), findsOneWidget);
   });
 
   testWidgets('the kana grid opens a kana\'s detail', (tester) async {

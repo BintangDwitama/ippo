@@ -7,6 +7,9 @@ mnemonics and audio, spaced-repetition reviews, and a goal to keep pace.
 Built with Flutter, Android first. Everything is stored on the device and
 works offline.
 
+The look is chosen in Settings > Appearance: Automatic (Daylight by day,
+Night in dark mode), Daylight, Night or Paper. All themes share one layout.
+
 ## Getting started
 
 ```
@@ -36,9 +39,12 @@ lib/
   app_dependencies.dart   repositories and use cases, built once
   routing/                go_router routes
   ui/                     screens, one ViewModel and UiState per screen
+  ui/core/theme/          design tokens and the Daylight, Night and Paper themes
+  ui/core/widgets/        shared widgets; they read tokens, never a theme name
   domain/                 models, the scheduler, use cases
   data/                   repositories, services, seed loader
 assets/seed/kana.json     the 92 kana with readings and mnemonics
+assets/fonts/             bundled fonts (SIL Open Font License) and their licences
 openspec/                 specs, design and tasks for each change
 ```
 

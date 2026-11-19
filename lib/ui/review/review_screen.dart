@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ippo/domain/models/review_card.dart';
-import 'package:ippo/ui/core/app_theme.dart';
-import 'package:ippo/ui/core/widgets.dart';
+import 'package:ippo/ui/core/spacing.dart';
+import 'package:ippo/ui/core/widgets/widgets.dart';
 import 'package:ippo/ui/review/review_ui_state.dart';
 import 'package:ippo/ui/review/review_view_model.dart';
 import 'package:provider/provider.dart';
@@ -16,21 +16,14 @@ class ReviewScreen extends StatelessWidget {
     final state = viewModel.uiState;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          state is ReviewQuestion
-              ? 'Review  ${state.reviewed} / ${state.total}'
-              : 'Review',
-        ),
-        bottom: state is ReviewQuestion
-            ? PreferredSize(
-                preferredSize: const Size.fromHeight(4),
-                child: LinearProgressIndicator(
-                  value: state.reviewed / state.total,
-                ),
-              )
-            : null,
-      ),
+      appBar: state is ReviewQuestion
+          ? sessionAppBar(
+              context,
+              title: 'Review',
+              progress: state.reviewed / state.total,
+              count: '${state.reviewed} / ${state.total}',
+            )
+          : sessionAppBar(context, title: 'Review'),
       body: SafeArea(
         child: switch (state) {
           ReviewLoading() => const Center(child: CircularProgressIndicator()),
@@ -86,36 +79,50 @@ class _Question extends StatelessWidget {
       padding: const EdgeInsets.all(Gaps.page),
       child: Column(
         children: [
-          if (state.isRepeat)
-            Chip(
-              label: const Text('Once more'),
-              backgroundColor: theme.colorScheme.tertiaryContainer,
-            ),
           Expanded(
-            child: Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      switch (state.promptType) {
-                        PromptType.charToSoundChoice => 'How is this read?',
-                        PromptType.soundToCharChoice =>
-                          'Which kana makes this sound?',
-                        PromptType.charToSoundTyped => 'Type the reading',
-                      },
-                      style: theme.textTheme.titleMedium,
-                    ),
-                    Gaps.medium,
-                    if (isListening)
-                      AudioButton(onPressed: viewModel.replaySound, large: true)
-                    else
-                      KanaText(state.item.kana.character, size: 160),
-                  ],
+            child: IppoCard(
+              child: Center(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (state.isRepeat) ...[
+                        Chip(
+                          label: const Text('Once more'),
+                          backgroundColor: theme.colorScheme.tertiaryContainer,
+                          labelStyle: TextStyle(
+                            color: theme.colorScheme.onTertiaryContainer,
+                          ),
+                        ),
+                        Gaps.small,
+                      ],
+                      Text(
+                        switch (state.promptType) {
+                          PromptType.charToSoundChoice => 'How is this read?',
+                          PromptType.soundToCharChoice =>
+                            'Which kana makes this sound?',
+                          PromptType.charToSoundTyped => 'Type the reading',
+                        },
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      Gaps.small,
+                      if (isListening)
+                        AudioButton(
+                          onPressed: viewModel.replaySound,
+                          large: true,
+                        )
+                      else
+                        KanaText(state.item.kana.character, size: 160),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
+          Gaps.medium,
           if (state.promptType.isTyped)
             _TypedAnswer(onSubmitted: viewModel.answerTyped)
           else
@@ -165,10 +172,7 @@ class _TypedAnswerState extends State<_TypedAnswer> {
           textInputAction: TextInputAction.done,
           keyboardType: TextInputType.visiblePassword,
           style: const TextStyle(fontSize: 28),
-          decoration: const InputDecoration(
-            hintText: 'romaji',
-            border: OutlineInputBorder(),
-          ),
+          decoration: const InputDecoration(hintText: 'romaji'),
           onSubmitted: widget.onSubmitted,
         ),
         Gaps.medium,
@@ -198,11 +202,12 @@ class _Feedback extends StatelessWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  Text(
-                    'Not quite. You answered "${state.givenAnswer}".',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(color: theme.colorScheme.error),
+                  FeedbackBanner(
+                    isCorrect: false,
+                    label: 'Not quite',
+                    detail: 'You answered "${state.givenAnswer}". '
+                        'The answer is ${state.item.kana.character} '
+                        '(${state.item.kana.romaji}).',
                   ),
                   Gaps.medium,
                   KanaText(state.item.kana.character, size: 140),

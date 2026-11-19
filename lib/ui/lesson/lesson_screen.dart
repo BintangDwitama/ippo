@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ippo/ui/core/app_theme.dart';
-import 'package:ippo/ui/core/widgets.dart';
+import 'package:ippo/ui/core/spacing.dart';
+import 'package:ippo/ui/core/widgets/widgets.dart';
 import 'package:ippo/ui/lesson/lesson_ui_state.dart';
 import 'package:ippo/ui/lesson/lesson_view_model.dart';
 import 'package:provider/provider.dart';
@@ -15,14 +15,20 @@ class LessonScreen extends StatelessWidget {
     final state = viewModel.uiState;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Lesson'),
-        bottom: switch (state) {
-          LessonPresenting() => _progress(state.index / state.total),
-          LessonQuiz() => _progress(state.answered / state.total),
-          _ => null,
-        },
-      ),
+      appBar: switch (state) {
+        LessonPresenting() => sessionAppBar(
+            context,
+            title: 'Lesson',
+            progress: state.index / state.total,
+          ),
+        LessonQuiz() => sessionAppBar(
+            context,
+            title: 'Lesson quiz',
+            progress: state.answered / state.total,
+            count: '${state.answered} / ${state.total}',
+          ),
+        _ => sessionAppBar(context, title: 'Lesson'),
+      },
       body: SafeArea(
         child: switch (state) {
           LessonLoading() => const Center(child: CircularProgressIndicator()),
@@ -49,13 +55,6 @@ class LessonScreen extends StatelessWidget {
       ),
     );
   }
-
-  PreferredSizeWidget _progress(double value) {
-    return PreferredSize(
-      preferredSize: const Size.fromHeight(4),
-      child: LinearProgressIndicator(value: value),
-    );
-  }
 }
 
 class _Presenting extends StatelessWidget {
@@ -77,7 +76,9 @@ class _Presenting extends StatelessWidget {
                 children: [
                   Text(
                     'New kana ${state.index + 1} of ${state.total}',
-                    style: theme.textTheme.labelLarge,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                   ),
                   Gaps.medium,
                   KanaText(state.item.kana.character, size: 160),
@@ -111,26 +112,34 @@ class _Quiz extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.all(Gaps.page),
       child: Column(
         children: [
           Expanded(
-            child: Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'How is this read?',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    KanaText(state.item.kana.character, size: 160),
-                  ],
+            child: IppoCard(
+              child: Center(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'How is this read?',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      Gaps.small,
+                      KanaText(state.item.kana.character, size: 160),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
+          Gaps.medium,
           ChoiceGrid(
             labels: [for (final option in state.options) option.kana.romaji],
             onSelected: (index) => viewModel.answer(state.options[index]),
@@ -158,10 +167,11 @@ class _Feedback extends StatelessWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  Text(
-                    'Not quite. You chose "${state.chosen.kana.romaji}".',
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(color: theme.colorScheme.error),
+                  FeedbackBanner(
+                    isCorrect: false,
+                    label: 'Not quite',
+                    detail: 'You chose "${state.chosen.kana.romaji}". '
+                        'The answer is "${state.item.kana.romaji}".',
                   ),
                   Gaps.medium,
                   KanaText(state.item.kana.character, size: 140),

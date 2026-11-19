@@ -1,3 +1,4 @@
+import 'package:ippo/domain/models/appearance_mode.dart';
 import 'package:ippo/domain/models/reminder_time.dart';
 
 /// Access to the learner's preferences.
@@ -18,4 +19,12 @@ abstract interface class SettingsRepository {
   Future<bool> isVoiceNoticeShown();
 
   Future<void> setVoiceNoticeShown();
+
+  /// The chosen appearance now and after every change.
+  Stream<AppearanceMode> getAppearanceModeStream();
+
+  /// [AppearanceMode.automatic] until the learner chooses.
+  Future<AppearanceMode> getAppearanceMode();
+
+  Future<void> setAppearanceMode(AppearanceMode mode);
 }

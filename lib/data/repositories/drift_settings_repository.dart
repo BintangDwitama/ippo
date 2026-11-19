@@ -1,5 +1,6 @@
 import 'package:ippo/data/repositories/settings_repository.dart';
 import 'package:ippo/data/services/app_database.dart';
+import 'package:ippo/domain/models/appearance_mode.dart';
 import 'package:ippo/domain/models/reminder_time.dart';
 
 class DriftSettingsRepository implements SettingsRepository {
@@ -8,6 +9,7 @@ class DriftSettingsRepository implements SettingsRepository {
   static const _reviewCap = 'daily_review_cap';
   static const _reminderMinutes = 'reminder_minutes';
   static const _voiceNoticeShown = 'voice_notice_shown';
+  static const _appearanceMode = 'appearance_mode';
 
   final AppDatabase _db;
 
@@ -53,6 +55,25 @@ class DriftSettingsRepository implements SettingsRepository {
 
   @override
   Future<void> setVoiceNoticeShown() => _write(_voiceNoticeShown, 'true');
+
+  @override
+  Stream<AppearanceMode> getAppearanceModeStream() {
+    return (_db.select(_db.settings)
+          ..where((t) => t.name.equals(_appearanceMode)))
+        .watchSingleOrNull()
+        .map((row) => AppearanceMode.fromName(row?.value))
+        .distinct();
+  }
+
+  @override
+  Future<AppearanceMode> getAppearanceMode() async {
+    return AppearanceMode.fromName(await _read(_appearanceMode));
+  }
+
+  @override
+  Future<void> setAppearanceMode(AppearanceMode mode) {
+    return _write(_appearanceMode, mode.name);
+  }
 
   Future<String?> _read(String name) async {
     final row = await (_db.select(_db.settings)

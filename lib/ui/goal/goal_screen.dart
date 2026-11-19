@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ippo/domain/models/goal.dart';
 import 'package:ippo/domain/use_cases/save_goal.dart';
-import 'package:ippo/ui/core/app_theme.dart';
+import 'package:ippo/ui/core/spacing.dart';
+import 'package:ippo/ui/core/widgets/widgets.dart';
 import 'package:ippo/ui/goal/goal_ui_state.dart';
 import 'package:ippo/ui/goal/goal_view_model.dart';
 import 'package:provider/provider.dart';
@@ -117,11 +118,10 @@ class GoalScreen extends StatelessWidget {
                   ),
                 ],
                 Gaps.large,
-                FilledButton(
+                PrimaryButton(
+                  label:
+                      state.startsNewGoal ? 'Start this goal' : 'Save changes',
                   onPressed: () => _save(context),
-                  child: Text(
-                    state.startsNewGoal ? 'Start this goal' : 'Save changes',
-                  ),
                 ),
               ],
             ),
@@ -150,28 +150,35 @@ class _StatusBanner extends StatelessWidget {
         'Add more days below to extend it, or change the goal.',
       GoalStatus.active => '${progress.daysRemaining} days remaining.',
     };
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: theme.textTheme.titleLarge),
-            Gaps.small,
-            Text(
-              '${progress.introducedCount} of ${progress.totalCount} kana '
-              'introduced',
-            ),
-            Text(
-              accuracy == null
-                  ? 'No reviews in the last 7 days'
-                  : 'Accuracy over the last 7 days: '
-                      '${(accuracy * 100).round()}%',
-            ),
-            Gaps.small,
-            Text(hint),
-          ],
-        ),
+    return IppoCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: theme.textTheme.titleLarge),
+          Gaps.medium,
+          ProgressMeter(
+            value: progress.totalCount == 0
+                ? 0
+                : progress.introducedCount / progress.totalCount,
+          ),
+          Gaps.small,
+          Text(
+            '${progress.introducedCount} of ${progress.totalCount} kana '
+            'introduced',
+          ),
+          Text(
+            accuracy == null
+                ? 'No reviews in the last 7 days'
+                : 'Accuracy over the last 7 days: '
+                    '${(accuracy * 100).round()}%',
+          ),
+          Gaps.small,
+          Text(
+            hint,
+            style: theme.textTheme.bodyMedium
+                ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          ),
+        ],
       ),
     );
   }

@@ -141,8 +141,11 @@ class HomeViewModel extends ViewModel {
       goal: goal,
       progress: progress,
       dueCount: dueCount,
-      lessonSize:
-          _deps.getNextLesson(items: items, goal: goal, now: now).length,
+      nextLessonKana: [
+        for (final item
+            in _deps.getNextLesson(items: items, goal: goal, now: now))
+          item.kana.character,
+      ],
       streak: _deps.getStudyStats.streak(
         items: items,
         reviews: reviews,

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ippo/domain/models/kana_status.dart';
-import 'package:ippo/ui/core/app_theme.dart';
-import 'package:ippo/ui/core/widgets.dart';
+import 'package:ippo/ui/core/spacing.dart';
+import 'package:ippo/ui/core/theme/ippo_tokens.dart';
+import 'package:ippo/ui/core/widgets/widgets.dart';
 import 'package:ippo/ui/kana_grid/kana_detail_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -40,26 +41,22 @@ class KanaDetailScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(Gaps.page),
         children: [
-          KanaText(kana.character, size: 180),
-          Text(
-            kana.romaji,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.displaySmall,
-          ),
-          Gaps.small,
-          Center(
-            child: Chip(
-              label: Text(
-                switch (state.status) {
-                  KanaStatus.notStarted => 'Not started',
-                  KanaStatus.learning => 'Learning',
-                  KanaStatus.known => 'Known',
-                },
-              ),
+          IppoCard(
+            child: Column(
+              children: [
+                KanaText(kana.character, size: 180),
+                Text(
+                  kana.romaji,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.displaySmall,
+                ),
+                Gaps.small,
+                _StatusLabel(status: state.status),
+                Gaps.small,
+                AudioButton(onPressed: viewModel.playSound),
+              ],
             ),
           ),
-          Gaps.small,
-          Center(child: AudioButton(onPressed: viewModel.playSound)),
           Gaps.large,
           Text(
             mnemonic.isEdited ? 'Your mnemonic' : 'Mnemonic',
@@ -68,8 +65,8 @@ class KanaDetailScreen extends StatelessWidget {
           Gaps.small,
           MnemonicNote(mnemonic.text),
           Gaps.small,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+          Wrap(
+            alignment: WrapAlignment.end,
             children: [
               if (mnemonic.isEdited)
                 TextButton(
@@ -84,6 +81,45 @@ class KanaDetailScreen extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// The kana's learning status, in the same colours as its grid tile.
+class _StatusLabel extends StatelessWidget {
+  const _StatusLabel({required this.status});
+
+  final KanaStatus status;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tokens;
+    final (background, foreground, text) = switch (status) {
+      KanaStatus.notStarted => (
+          tokens.tileNotStarted,
+          tokens.onTileNotStarted,
+          'Not started',
+        ),
+      KanaStatus.learning => (
+          tokens.tileLearning,
+          tokens.onTileLearning,
+          'Learning',
+        ),
+      KanaStatus.known => (tokens.tileKnown, tokens.onTileKnown, 'Known'),
+    };
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(tokens.smallRadius),
+      ),
+      child: Text(
+        text,
+        style: Theme.of(context)
+            .textTheme
+            .labelLarge
+            ?.copyWith(color: foreground),
       ),
     );
   }
@@ -131,7 +167,6 @@ class _MnemonicDialogState extends State<_MnemonicDialog> {
         maxLines: 4,
         minLines: 2,
         decoration: InputDecoration(
-          border: const OutlineInputBorder(),
           hintText: 'What does this kana look or sound like to you?',
           errorText: _isInvalid ? 'Write something first.' : null,
         ),

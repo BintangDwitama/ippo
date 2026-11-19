@@ -18,21 +18,26 @@ import 'package:ippo/data/services/notification_service.dart';
 import 'package:ippo/data/services/tts_service.dart';
 import 'package:ippo/domain/scheduling/fsrs_scheduler.dart';
 import 'package:ippo/routing/app_router.dart';
-import 'package:ippo/ui/core/app_theme.dart';
+import 'package:ippo/domain/models/appearance_mode.dart';
+import 'package:ippo/ui/app/app_view_model.dart';
+import 'package:ippo/ui/core/theme/app_themes.dart';
+import 'package:ippo/ui/core/theme/font_licenses.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  registerFontLicenses(rootBundle.loadString);
 
   final database = AppDatabase(driftDatabase(name: 'ippo'));
   final itemRepository = DriftItemRepository(database);
+  final settingsRepository = DriftSettingsRepository(database);
   final dependencies = AppDependencies(
     itemRepository: itemRepository,
     mnemonicRepository: DriftMnemonicRepository(database),
     cardRepository: DriftCardRepository(database),
     reviewRepository: DriftReviewRepository(database),
     goalRepository: DriftGoalRepository(database),
-    settingsRepository: DriftSettingsRepository(database),
+    settingsRepository: settingsRepository,
     speechRepository: TtsSpeechRepository(TtsService()),
     reminderRepository:
         LocalNotificationReminderRepository(NotificationService()),
@@ -45,13 +50,28 @@ Future<void> main() async {
     loadSeedJson: () => rootBundle.loadString(KanaSeedLoader.assetPath),
   ).seed();
 
-  runApp(IppoApp(dependencies: dependencies));
+  // Read before the first frame so the app never flashes another theme.
+  final appearanceMode = await settingsRepository.getAppearanceMode();
+
+  runApp(
+    IppoApp(
+      dependencies: dependencies,
+      initialAppearanceMode: appearanceMode,
+    ),
+  );
 }
 
 class IppoApp extends StatefulWidget {
-  const IppoApp({super.key, required this.dependencies});
+  const IppoApp({
+    super.key,
+    required this.dependencies,
+    this.initialAppearanceMode = AppearanceMode.automatic,
+  });
 
   final AppDependencies dependencies;
+
+  /// The stored appearance, shown from the first frame.
+  final AppearanceMode initialAppearanceMode;
 
   @override
   State<IppoApp> createState() => _IppoAppState();
@@ -59,9 +79,14 @@ class IppoApp extends StatefulWidget {
 
 class _IppoAppState extends State<IppoApp> {
   late final GoRouter _router = createAppRouter();
+  late final AppViewModel _viewModel = AppViewModel(
+    widget.dependencies.settingsRepository,
+    initialAppearanceMode: widget.initialAppearanceMode,
+  );
 
   @override
   void dispose() {
+    _viewModel.dispose();
     _router.dispose();
     super.dispose();
   }
@@ -70,11 +95,20 @@ class _IppoAppState extends State<IppoApp> {
   Widget build(BuildContext context) {
     return Provider<AppDependencies>.value(
       value: widget.dependencies,
-      child: MaterialApp.router(
-        title: 'Ippo',
-        theme: AppTheme.light(),
-        darkTheme: AppTheme.dark(),
-        routerConfig: _router,
+      child: ListenableBuilder(
+        listenable: _viewModel,
+        builder: (context, _) {
+          final selection =
+              AppThemes.forMode(_viewModel.uiState.appearanceMode);
+          return MaterialApp.router(
+            title: 'Ippo',
+            debugShowCheckedModeBanner: false,
+            theme: selection.theme,
+            darkTheme: selection.darkTheme,
+            themeMode: selection.themeMode,
+            routerConfig: _router,
+          );
+        },
       ),
     );
   }

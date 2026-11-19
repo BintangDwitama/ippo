@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:ippo/app_dependencies.dart';
+import 'package:ippo/domain/models/appearance_mode.dart';
 import 'package:ippo/domain/models/reminder_time.dart';
 import 'package:ippo/ui/core/view_model.dart';
 import 'package:ippo/ui/settings/settings_ui_state.dart';
@@ -27,6 +28,7 @@ class SettingsViewModel extends ViewModel {
       isReminderPermissionDenied: _isPermissionDenied,
       isJapaneseVoiceAvailable:
           await _deps.speechRepository.isJapaneseVoiceAvailable(),
+      appearanceMode: await _deps.settingsRepository.getAppearanceMode(),
     );
     notify();
   }
@@ -43,6 +45,13 @@ class SettingsViewModel extends ViewModel {
     final granted = await _deps.reminderRepository.enableReminder(time);
     _isPermissionDenied = !granted;
     await _deps.settingsRepository.setReminderTime(granted ? time : null);
+    await _load();
+  }
+
+  /// Stores the chosen appearance. The app itself restyles by observing
+  /// the setting, not through this ViewModel.
+  Future<void> setAppearanceMode(AppearanceMode mode) async {
+    await _deps.settingsRepository.setAppearanceMode(mode);
     await _load();
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:ippo/data/repositories/settings_repository.dart';
 import 'package:ippo/domain/models/appearance_mode.dart';
 import 'package:ippo/domain/models/reminder_time.dart';
+import 'package:ippo/domain/models/speech_speed.dart';
 
 @immutable
 class SettingsUiState {
@@ -12,6 +13,7 @@ class SettingsUiState {
     this.isReminderPermissionDenied = false,
     this.isJapaneseVoiceAvailable = true,
     this.appearanceMode = AppearanceMode.automatic,
+    this.speechSpeed = SpeechSpeed.fallback,
   });
 
   final bool isLoading;
@@ -24,6 +26,7 @@ class SettingsUiState {
   final bool isReminderPermissionDenied;
   final bool isJapaneseVoiceAvailable;
   final AppearanceMode appearanceMode;
+  final SpeechSpeed speechSpeed;
 
   bool get isReminderOn => reminderTime != null;
 }

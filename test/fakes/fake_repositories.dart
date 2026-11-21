@@ -22,6 +22,7 @@ import 'package:ippo/domain/models/review_card.dart';
 import 'package:ippo/domain/models/review_record.dart';
 import 'package:ippo/domain/models/scheduling_state.dart';
 import 'package:ippo/domain/models/seed_item.dart';
+import 'package:ippo/domain/models/speech_speed.dart';
 
 /// Emits the current value on listen, then every later change.
 class _Observable<T> {
@@ -329,6 +330,16 @@ class FakeSettingsRepository implements SettingsRepository {
   Future<void> setAppearanceMode(AppearanceMode mode) async {
     appearanceMode = mode;
     _appearanceChanges.add(mode);
+  }
+
+  SpeechSpeed speechSpeed = SpeechSpeed.fallback;
+
+  @override
+  Future<SpeechSpeed> getSpeechSpeed() async => speechSpeed;
+
+  @override
+  Future<void> setSpeechSpeed(SpeechSpeed speed) async {
+    speechSpeed = speed;
   }
 
   DateTime? lastExportAt;

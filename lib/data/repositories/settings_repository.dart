@@ -1,5 +1,6 @@
 import 'package:ippo/domain/models/appearance_mode.dart';
 import 'package:ippo/domain/models/reminder_time.dart';
+import 'package:ippo/domain/models/speech_speed.dart';
 
 /// Access to the learner's preferences.
 abstract interface class SettingsRepository {
@@ -32,4 +33,11 @@ abstract interface class SettingsRepository {
   Future<DateTime?> getLastExportAt();
 
   Future<void> setLastExportAt(DateTime time);
+
+  /// How fast kana are spoken on this phone; [SpeechSpeed.fallback] until
+  /// the learner chooses. Belongs to the phone's voice, so it is not part
+  /// of a backup.
+  Future<SpeechSpeed> getSpeechSpeed();
+
+  Future<void> setSpeechSpeed(SpeechSpeed speed);
 }

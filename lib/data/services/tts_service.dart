@@ -7,7 +7,10 @@ class TtsService {
   static const String japanese = 'ja-JP';
 
   final FlutterTts _tts;
-  bool _configured = false;
+  bool _languageSet = false;
+
+  /// The rate the engine was last given; null before the first speech.
+  double? _rate;
 
   Future<bool> isJapaneseAvailable() async {
     try {
@@ -18,12 +21,16 @@ class TtsService {
     }
   }
 
-  Future<void> speakJapanese(String text) async {
-    if (!_configured) {
+  /// Speaks [text] in Japanese at [rate], where 0.5 is the voice's natural
+  /// speed. Interrupts anything still being spoken.
+  Future<void> speakJapanese(String text, {required double rate}) async {
+    if (!_languageSet) {
       await _tts.setLanguage(japanese);
-      // Slightly slow, so single syllables are easy to hear.
-      await _tts.setSpeechRate(0.4);
-      _configured = true;
+      _languageSet = true;
+    }
+    if (_rate != rate) {
+      await _tts.setSpeechRate(rate);
+      _rate = rate;
     }
     await _tts.stop();
     await _tts.speak(text);

@@ -2,6 +2,7 @@ import 'package:ippo/data/repositories/settings_repository.dart';
 import 'package:ippo/data/services/app_database.dart';
 import 'package:ippo/domain/models/appearance_mode.dart';
 import 'package:ippo/domain/models/reminder_time.dart';
+import 'package:ippo/domain/models/speech_speed.dart';
 
 class DriftSettingsRepository implements SettingsRepository {
   DriftSettingsRepository(this._db);
@@ -11,6 +12,7 @@ class DriftSettingsRepository implements SettingsRepository {
   static const _voiceNoticeShown = 'voice_notice_shown';
   static const _appearanceMode = 'appearance_mode';
   static const _lastExportAt = 'last_export_at';
+  static const _speechSpeed = 'speech_speed';
 
   final AppDatabase _db;
 
@@ -85,6 +87,16 @@ class DriftSettingsRepository implements SettingsRepository {
   @override
   Future<void> setLastExportAt(DateTime time) {
     return _write(_lastExportAt, time.toUtc().toIso8601String());
+  }
+
+  @override
+  Future<SpeechSpeed> getSpeechSpeed() async {
+    return SpeechSpeed.fromName(await _read(_speechSpeed));
+  }
+
+  @override
+  Future<void> setSpeechSpeed(SpeechSpeed speed) {
+    return _write(_speechSpeed, speed.name);
   }
 
   Future<String?> _read(String name) async {

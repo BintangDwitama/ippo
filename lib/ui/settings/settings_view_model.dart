@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:ippo/app_dependencies.dart';
 import 'package:ippo/domain/models/appearance_mode.dart';
 import 'package:ippo/domain/models/reminder_time.dart';
+import 'package:ippo/domain/models/speech_speed.dart';
 import 'package:ippo/ui/core/view_model.dart';
 import 'package:ippo/ui/settings/settings_ui_state.dart';
 
@@ -29,6 +30,7 @@ class SettingsViewModel extends ViewModel {
       isJapaneseVoiceAvailable:
           await _deps.speechRepository.isJapaneseVoiceAvailable(),
       appearanceMode: await _deps.settingsRepository.getAppearanceMode(),
+      speechSpeed: await _deps.settingsRepository.getSpeechSpeed(),
     );
     notify();
   }
@@ -56,6 +58,24 @@ class SettingsViewModel extends ViewModel {
   Future<void> setAppearanceMode(AppearanceMode mode) async {
     await _deps.settingsRepository.setAppearanceMode(mode);
     await _load();
+  }
+
+  /// A few kana, spoken to let the learner judge the speaking speed.
+  static const String speechSample = 'あ、か、さ';
+
+  /// Stores the speaking speed and plays the sample at it, so one tap
+  /// answers how the choice sounds.
+  Future<void> setSpeechSpeed(SpeechSpeed speed) async {
+    await _deps.settingsRepository.setSpeechSpeed(speed);
+    await _load();
+    await playSample();
+  }
+
+  /// Speaks the sample at the stored speed. Does nothing without a
+  /// Japanese voice.
+  Future<void> playSample() async {
+    if (!_uiState.isJapaneseVoiceAvailable) return;
+    await _deps.speechRepository.speak(speechSample);
   }
 
   Future<void> disableReminder() async {

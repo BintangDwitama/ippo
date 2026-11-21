@@ -42,7 +42,7 @@ Future<void> main() async {
     reviewRepository: DriftReviewRepository(database),
     goalRepository: DriftGoalRepository(database),
     settingsRepository: settingsRepository,
-    speechRepository: TtsSpeechRepository(TtsService()),
+    speechRepository: TtsSpeechRepository(TtsService(), settingsRepository),
     reminderRepository:
         LocalNotificationReminderRepository(NotificationService()),
     backupRepository: DriftBackupRepository(database, settingsRepository),

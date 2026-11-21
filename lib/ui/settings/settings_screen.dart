@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ippo/domain/models/appearance_mode.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ippo/domain/models/reminder_time.dart';
+import 'package:ippo/domain/models/speech_speed.dart';
 import 'package:ippo/routing/routes.dart';
 import 'package:ippo/ui/settings/settings_view_model.dart';
 import 'package:provider/provider.dart';
@@ -121,6 +122,35 @@ class SettingsScreen extends StatelessWidget {
                               'Listening reviews are paused until then.',
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                  child: Text(
+                    'Speaking speed',
+                    style: theme.textTheme.titleSmall,
+                  ),
+                ),
+                for (final speed in SpeechSpeed.values)
+                  _SpeedOption(
+                    speed: speed,
+                    isSelected: speed == state.speechSpeed,
+                    onSelected: () => viewModel.setSpeechSpeed(speed),
+                  ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(48, 48),
+                      ),
+                      onPressed: state.isJapaneseVoiceAvailable
+                          ? viewModel.playSample
+                          : null,
+                      icon: const Icon(Icons.volume_up),
+                      label: const Text('Play a sample'),
+                    ),
+                  ),
+                ),
                 const Divider(),
                 const _SectionTitle('Your data'),
                 ListTile(
@@ -170,6 +200,44 @@ class _SectionTitle extends StatelessWidget {
             color: theme.colorScheme.primary,
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// One choice of speaking speed; exactly one is selected.
+class _SpeedOption extends StatelessWidget {
+  const _SpeedOption({
+    required this.speed,
+    required this.isSelected,
+    required this.onSelected,
+  });
+
+  final SpeechSpeed speed;
+  final bool isSelected;
+  final VoidCallback onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Semantics(
+      inMutuallyExclusiveGroup: true,
+      checked: isSelected,
+      child: ListTile(
+        leading: Icon(
+          isSelected
+              ? Icons.radio_button_checked
+              : Icons.radio_button_unchecked,
+          color: isSelected ? scheme.primary : scheme.onSurfaceVariant,
+        ),
+        title: Text(
+          switch (speed) {
+            SpeechSpeed.normal => 'Normal',
+            SpeechSpeed.slow => 'Slow',
+            SpeechSpeed.verySlow => 'Very slow',
+          },
+        ),
+        onTap: onSelected,
       ),
     );
   }

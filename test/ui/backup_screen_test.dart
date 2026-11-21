@@ -55,7 +55,9 @@ void main() {
 
     await tester.pageBack();
     await tester.pumpAndSettle();
-    expect(find.text('Daily review limit'), findsOneWidget);
+    // Back on settings, still scrolled to where the entry is.
+    expect(find.text('Backup and restore'), findsOneWidget);
+    expect(find.text('Export backup'), findsNothing);
   });
 
   testWidgets('an export is confirmed and dated', (tester) async {

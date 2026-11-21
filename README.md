@@ -10,6 +10,9 @@ works offline.
 The look is chosen in Settings > Appearance: Automatic (Daylight by day,
 Night in dark mode), Daylight, Night or Paper. All themes share one layout.
 
+Kana are read aloud by the phone's Japanese voice. Settings > Sound sets
+the speaking speed (Normal, Slow or Very slow) and plays a sample.
+
 ## What it teaches
 
 208 kana: for each script, the 46 basic kana, 25 voiced (が, ぱ) and 33

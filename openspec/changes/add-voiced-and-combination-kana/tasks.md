@@ -59,6 +59,6 @@
 
 - [x] 10.1 Run `flutter analyze` and `flutter test`; fix all issues
 - [x] 10.2 Update README.md: 208 kana, the teaching path, and that older versions cannot import newer backups
-- [ ] 10.3 On the phone: export a backup, note the goal progress, cards due and streak, install the release build over the app, and confirm all three are unchanged
-- [ ] 10.4 On the phone: confirm the grid shows three sections, a wrong option for a basic kana is now a look-alike or row-mate, and the goal screen lists six target sets
+- [x] 10.3 On the phone: export a backup, note the goal progress, cards due and streak, install the release build over the app, and confirm all three are unchanged
+- [x] 10.4 On the phone: confirm the grid shows three sections, a wrong option for a basic kana is now a look-alike or row-mate, and the goal screen lists six target sets
 - [ ] 10.5 On the phone: play the sound of が, ぢ, づ, ぱ, きゃ and しょ from the kana detail screen and judge each

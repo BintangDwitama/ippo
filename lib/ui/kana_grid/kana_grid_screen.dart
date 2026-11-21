@@ -23,7 +23,7 @@ class KanaGridScreen extends StatelessWidget {
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
-              padding: const EdgeInsets.all(Gaps.page),
+              padding: Gaps.pagePadding(context),
               children: [
                 SegmentedButton<KanaScript>(
                   segments: const [

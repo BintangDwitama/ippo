@@ -39,7 +39,7 @@ class GoalScreen extends StatelessWidget {
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
-              padding: const EdgeInsets.all(Gaps.page),
+              padding: Gaps.pagePadding(context),
               children: [
                 if (state.progress != null) ...[
                   _StatusBanner(state: state),

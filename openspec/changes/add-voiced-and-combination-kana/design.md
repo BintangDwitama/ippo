@@ -170,6 +170,13 @@ They are produced from a pattern during implementation and then live in the seed
 - **Run against a copy of the phone's real database** (taken 21 Nov 2026, 10 of 46 hiragana introduced, 20 cards, 30 reviews): learner data was byte-identical in a backup before and after seeding, the goal still read 10 of 46 with the same accuracy and days remaining, the database grew to 208 kana, and the next lesson was さ し す せ そ.
 - **Full path check**: a test introduces every lesson in turn with no goal and finds 42 lessons, none above six kana and none mixing scripts or groups.
 
+### 12. Results on the phone (Samsung SM S731B, Android 16), 22 Nov 2026
+
+- **In-place update (task 10.3): passed.** Before the update the home screen showed 10 cards to review, the さ row as the next lesson, 11 days left, 10 of 46 kana introduced, 100% accuracy and a 1-day streak. After installing the release build over the app it showed exactly the same. A version 1 backup was exported from the old build first and copied off the phone.
+- **Screens (task 10.4): passed.** The grid opens with a Basic section and the count "0 known, 10 learning, 94 not started", and continues through Voiced and Combination. A sound-to-character review offered け, こ, か and く, all from one row. The goal screen lists the six target sets with 46, 58, 46, 58, 92 and 208 kana.
+- **Bottom spacing fixed.** On this phone the system navigation bar covered the last row of the grid and would have covered the goal screen's save button, because those lists did not allow for it. The home, grid, kana detail and goal lists now add the system's bottom inset to their padding.
+- **Sounds (task 10.5): not done.** Judging how the phone pronounces が, ぢ, づ, ぱ, きゃ and しょ needs a listener.
+
 ## Risks / Trade-offs
 
 - **Seeding now writes to existing rows on real data** → Covered by the previous-state test, and by an in-place update on the phone after a fresh export, with the goal, card count and streak compared before and after.

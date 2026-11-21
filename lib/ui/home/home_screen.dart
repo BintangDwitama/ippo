@@ -58,7 +58,7 @@ class HomeScreen extends StatelessWidget {
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
-              padding: const EdgeInsets.all(Gaps.page),
+              padding: Gaps.pagePadding(context),
               children: [
                 if (state.showVoiceNotice) ...[
                   _VoiceNotice(onDismiss: viewModel.dismissVoiceNotice),

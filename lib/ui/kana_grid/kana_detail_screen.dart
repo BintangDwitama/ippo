@@ -39,7 +39,7 @@ class KanaDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(kana.romaji)),
       body: ListView(
-        padding: const EdgeInsets.all(Gaps.page),
+        padding: Gaps.pagePadding(context),
         children: [
           IppoCard(
             child: Column(

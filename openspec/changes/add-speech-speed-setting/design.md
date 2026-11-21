@@ -67,6 +67,14 @@ In the Sound section, under the voice status: a "Speaking speed" heading, three 
 - **ViewModel**: loads the stored speed; `setSpeechSpeed` stores it and plays the sample; `playSample` speaks through the speech repository; nothing is spoken when no voice is available.
 - **Widget**: the three options and the sample button appear, and the screen fits a small screen with large text in each theme.
 
+### 7. Notes from implementation
+
+- **`TtsService` now sets the language once and the rate whenever it changes,** so the first sound after a new choice already uses it.
+- **The speech repository is tested against a fake service** that records the text and rate of each request.
+- **Choosing a speed without a Japanese voice** stores the choice and plays nothing.
+- **The settings list grew past one screen,** so one older test that expected the first entries to be visible after returning from the Backup screen was changed to look at what is actually on screen.
+- **On the phone, 22 Nov 2026:** the release build was installed over the app (the package manager reports the update). Progress and the new setting were not checked on screen, because the phone was in use; that check and the listening test are left to the owner (tasks 5.1 and 5.2).
+
 ## Risks / Trade-offs
 
 - **The slowest speed may sound distorted on some voices** → Judged by ear on the phone; the rate is one constant to adjust.

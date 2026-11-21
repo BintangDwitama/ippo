@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ippo/app_dependencies.dart';
 import 'package:ippo/domain/models/goal.dart';
+import 'package:ippo/domain/models/item.dart';
 import 'package:ippo/domain/use_cases/save_goal.dart';
 import 'package:ippo/ui/core/view_model.dart';
 import 'package:ippo/ui/goal/goal_ui_state.dart';
@@ -18,13 +19,22 @@ class GoalViewModel extends ViewModel {
 
   Future<void> _load() async {
     final goal = await _deps.goalRepository.getCurrentGoal();
+    final items = await _deps.itemRepository.getItems();
+    final kana = [
+      for (final item in items)
+        if (item.kind == ItemKind.kana) item.kana,
+    ];
+    final targetCounts = {
+      for (final target in GoalTargetSet.values)
+        target: kana.where(target.includes).length,
+    };
     if (goal == null) {
-      _setState(const GoalUiState(isLoading: false));
+      _setState(GoalUiState(isLoading: false, targetCounts: targetCounts));
       return;
     }
     final progress = _deps.getGoalProgress(
       goal: goal,
-      items: await _deps.itemRepository.getItems(),
+      items: items,
       cards: await _deps.cardRepository.getCards(),
       reviews: await _deps.reviewRepository.getReviews(),
       now: _deps.clock(),
@@ -35,10 +45,11 @@ class GoalViewModel extends ViewModel {
         isLoading: false,
         goal: goal,
         progress: progress,
-        // After an achieved hiragana goal, suggest katakana next.
-        targetSet: achieved && goal.targetSet == GoalTargetSet.hiragana
-            ? GoalTargetSet.katakana
+        // After an achieved goal, suggest the next step of the path.
+        targetSet: achieved
+            ? goal.targetSet.next ?? goal.targetSet
             : goal.targetSet,
+        targetCounts: targetCounts,
         accuracyPercent: (goal.targetAccuracy * 100).round(),
         deadlineDays: achieved
             ? SaveGoal.presetDeadlineDays

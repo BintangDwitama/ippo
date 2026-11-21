@@ -7,11 +7,13 @@ import 'package:ippo/domain/models/scheduling_state.dart';
 import 'package:ippo/domain/use_cases/save_goal.dart';
 import 'package:ippo/ui/goal/goal_view_model.dart';
 import 'package:ippo/ui/kana_grid/kana_detail_view_model.dart';
+import 'package:ippo/ui/kana_grid/kana_grid_ui_state.dart';
 import 'package:ippo/ui/kana_grid/kana_grid_view_model.dart';
 import 'package:ippo/ui/settings/settings_view_model.dart';
 
 import '../support/builders.dart';
 import '../support/fake_dependencies.dart';
+import '../support/seed_items.dart';
 
 void main() {
   final now = DateTime(2026, 1, 10, 9);
@@ -40,7 +42,9 @@ void main() {
       final viewModel =
           await create(FakeDependencies(items: kanaItems(hiraganaCount: 12)));
 
-      final rows = viewModel.uiState.rows;
+      expect(viewModel.uiState.sections, hasLength(1));
+      expect(viewModel.uiState.sections.single.group, KanaGroup.basic);
+      final rows = viewModel.uiState.sections.single.rows;
       expect(rows, hasLength(3));
       expect(
         rows[0].map((c) => c?.item.kana.character),
@@ -64,7 +68,7 @@ void main() {
         ),
       );
 
-      final rows = viewModel.uiState.rows;
+      final rows = viewModel.uiState.sections.single.rows;
       expect(
         rows[0].map((c) => c?.item.kana.character),
         ['や', null, 'ゆ', null, 'よ'],
@@ -94,9 +98,10 @@ void main() {
       final state = viewModel.uiState;
       expect(state.knownCount, 1);
       expect(state.learningCount, 4);
-      expect(state.rows[0][0]!.status, KanaStatus.known);
-      expect(state.rows[0][1]!.status, KanaStatus.learning);
-      expect(state.rows[1][0]!.status, KanaStatus.notStarted);
+      final rows = state.sections.single.rows;
+      expect(rows[0][0]!.status, KanaStatus.known);
+      expect(rows[0][1]!.status, KanaStatus.learning);
+      expect(rows[1][0]!.status, KanaStatus.notStarted);
     });
 
     test('switches script', () async {
@@ -108,7 +113,39 @@ void main() {
 
       expect(viewModel.uiState.script, KanaScript.katakana);
       expect(viewModel.uiState.totalCount, 6);
-      expect(viewModel.uiState.rows[0][0]!.item.kana.character, 'ア');
+      expect(
+        viewModel.uiState.sections.single.rows[0][0]!.item.kana.character,
+        'ア',
+      );
+    });
+
+    test('shows the real kana in three sections per script', () async {
+      final viewModel =
+          await create(FakeDependencies(items: seedKanaItems()));
+
+      final state = viewModel.uiState;
+      expect(state.totalCount, 104);
+      expect(state.sections.map((s) => s.group), KanaGroup.values);
+      int cells(KanaSection section) => section.rows
+          .expand((row) => row)
+          .where((cell) => cell != null)
+          .length;
+      expect(state.sections.map(cells), [46, 25, 33]);
+      // Basic: eleven lines, a to n. Voiced: five. Combination: eleven.
+      expect(state.sections.map((s) => s.rows.length), [11, 5, 11]);
+      List<String?> row(int section, int index) => [
+            for (final cell in state.sections[section].rows[index])
+              cell?.item.kana.character,
+          ];
+      expect(row(0, 7), ['や', null, 'ゆ', null, 'よ']);
+      expect(row(0, 9), ['わ', null, null, null, 'を']);
+      expect(row(0, 10), ['ん', null, null, null, null]);
+      expect(row(1, 2), ['だ', 'ぢ', 'づ', 'で', 'ど']);
+      expect(row(2, 0), ['きゃ', null, 'きゅ', null, 'きょ']);
+
+      viewModel.selectScript(KanaScript.katakana);
+      expect(viewModel.uiState.totalCount, 104);
+      expect(viewModel.uiState.sections.map(cells), [46, 25, 33]);
     });
   });
 
@@ -203,6 +240,74 @@ void main() {
       expect(state.deadlineDays, 14);
     });
 
+    test('counts the kana of every target set', () async {
+      final viewModel =
+          await create(FakeDependencies(items: seedKanaItems(), now: now));
+
+      expect(viewModel.uiState.targetCounts, {
+        GoalTargetSet.hiragana: 46,
+        GoalTargetSet.katakana: 46,
+        GoalTargetSet.both: 92,
+        GoalTargetSet.hiraganaExtended: 58,
+        GoalTargetSet.katakanaExtended: 58,
+        GoalTargetSet.everything: 208,
+      });
+    });
+
+    test('keeps the counts while the form is edited', () async {
+      final viewModel =
+          await create(FakeDependencies(items: seedKanaItems(), now: now));
+
+      viewModel.setTargetSet(GoalTargetSet.everything);
+
+      expect(viewModel.uiState.targetSet, GoalTargetSet.everything);
+      expect(viewModel.uiState.targetCounts[GoalTargetSet.everything], 208);
+    });
+
+    test('suggests each next step of the path after an achieved goal',
+        () async {
+      Future<GoalTargetSet> suggestedAfter(GoalTargetSet achieved) async {
+        final viewModel = await create(
+          FakeDependencies(
+            items: seedKanaItems(
+              introduced: achieved.includes,
+              introducedAt: DateTime(2026, 1, 2),
+            ),
+            goal: goal(
+              createdAt: DateTime(2026, 1, 1),
+              targetSet: achieved,
+              status: GoalStatus.achieved,
+            ),
+            now: now,
+          ),
+        );
+        expect(viewModel.uiState.startsNewGoal, isTrue);
+        return viewModel.uiState.targetSet;
+      }
+
+      expect(
+        await suggestedAfter(GoalTargetSet.hiragana),
+        GoalTargetSet.hiraganaExtended,
+      );
+      expect(
+        await suggestedAfter(GoalTargetSet.hiraganaExtended),
+        GoalTargetSet.katakana,
+      );
+      expect(
+        await suggestedAfter(GoalTargetSet.katakana),
+        GoalTargetSet.katakanaExtended,
+      );
+      expect(
+        await suggestedAfter(GoalTargetSet.both),
+        GoalTargetSet.everything,
+      );
+      // At the end of a path the choice stays where it was.
+      expect(
+        await suggestedAfter(GoalTargetSet.katakanaExtended),
+        GoalTargetSet.katakanaExtended,
+      );
+    });
+
     test('saving an adjusted form creates the goal', () async {
       final deps =
           FakeDependencies(items: kanaItems(hiraganaCount: 46), now: now);
@@ -284,8 +389,9 @@ void main() {
       final viewModel = await create(deps);
 
       expect(viewModel.uiState.startsNewGoal, isTrue);
-      expect(viewModel.uiState.targetSet, GoalTargetSet.katakana);
+      expect(viewModel.uiState.targetSet, GoalTargetSet.hiraganaExtended);
 
+      viewModel.setTargetSet(GoalTargetSet.katakana);
       await viewModel.save();
 
       final next = (await deps.goals.getCurrentGoal())!;

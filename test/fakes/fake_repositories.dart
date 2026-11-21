@@ -61,20 +61,33 @@ class FakeItemRepository implements ItemRepository {
       _items.where((item) => item.id == id).firstOrNull;
 
   @override
-  Future<void> insertSeedItems(List<SeedItem> seedItems) async {
+  Future<void> syncSeedItems(List<SeedItem> seedItems) async {
     for (final seed in seedItems) {
-      if (_items.any((item) => item.key == seed.key)) continue;
-      final id = _items.length + 1;
-      _items.add(
-        Item(
-          id: id,
-          kind: seed.kind,
-          key: seed.key,
+      final index = _items.indexWhere((item) => item.key == seed.key);
+      if (index < 0) {
+        final id = _items.length + 1;
+        _items.add(
+          Item(
+            id: id,
+            kind: seed.kind,
+            key: seed.key,
+            sortOrder: seed.sortOrder,
+            payload: seed.payload,
+          ),
+        );
+        seededMnemonics[id] = seed.defaultMnemonic;
+      } else {
+        final item = _items[index];
+        _items[index] = Item(
+          id: item.id,
+          kind: item.kind,
+          key: item.key,
           sortOrder: seed.sortOrder,
           payload: seed.payload,
-        ),
-      );
-      seededMnemonics[id] = seed.defaultMnemonic;
+          introducedAt: item.introducedAt,
+        );
+        seededMnemonics[item.id] = seed.defaultMnemonic;
+      }
     }
     _observable.notify();
   }

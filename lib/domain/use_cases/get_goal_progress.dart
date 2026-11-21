@@ -47,7 +47,7 @@ class GetGoalProgress {
         .where(
           (item) =>
               item.kind == ItemKind.kana &&
-              goal.targetSet.includes(item.kana.script),
+              goal.targetSet.includes(item.kana),
         )
         .toList();
     final targetItemIds = targetItems.map((item) => item.id).toSet();

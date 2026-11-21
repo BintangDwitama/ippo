@@ -2,15 +2,50 @@ import 'package:ippo/domain/models/item.dart';
 import 'package:meta/meta.dart';
 
 /// Which kana a goal covers.
+///
+/// Stored by name. The first three keep the meaning they had before
+/// voiced and combination kana existed, so older goals cover the same
+/// kana as when they were set.
 enum GoalTargetSet {
+  /// The 46 basic hiragana.
   hiragana,
-  katakana,
-  both;
 
-  bool includes(KanaScript script) => switch (this) {
-        GoalTargetSet.hiragana => script == KanaScript.hiragana,
-        GoalTargetSet.katakana => script == KanaScript.katakana,
-        GoalTargetSet.both => true,
+  /// The 46 basic katakana.
+  katakana,
+
+  /// The basic kana of both scripts.
+  both,
+
+  /// The voiced and combination hiragana.
+  hiraganaExtended,
+
+  /// The voiced and combination katakana.
+  katakanaExtended,
+
+  /// Every kana.
+  everything;
+
+  bool includes(KanaPayload kana) {
+    final isBasic = kana.group == KanaGroup.basic;
+    final isHiragana = kana.script == KanaScript.hiragana;
+    return switch (this) {
+      GoalTargetSet.hiragana => isHiragana && isBasic,
+      GoalTargetSet.katakana => !isHiragana && isBasic,
+      GoalTargetSet.both => isBasic,
+      GoalTargetSet.hiraganaExtended => isHiragana && !isBasic,
+      GoalTargetSet.katakanaExtended => !isHiragana && !isBasic,
+      GoalTargetSet.everything => true,
+    };
+  }
+
+  /// The target to suggest once a goal for this one has been achieved:
+  /// the next step of the teaching path. Null at the end of a path.
+  GoalTargetSet? get next => switch (this) {
+        GoalTargetSet.hiragana => GoalTargetSet.hiraganaExtended,
+        GoalTargetSet.hiraganaExtended => GoalTargetSet.katakana,
+        GoalTargetSet.katakana => GoalTargetSet.katakanaExtended,
+        GoalTargetSet.both => GoalTargetSet.everything,
+        GoalTargetSet.katakanaExtended || GoalTargetSet.everything => null,
       };
 }
 

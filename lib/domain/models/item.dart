@@ -6,6 +6,18 @@ enum ItemKind { kana }
 
 enum KanaScript { hiragana, katakana }
 
+/// The part of a script a kana belongs to.
+enum KanaGroup {
+  /// The 46 kana of the basic table.
+  basic,
+
+  /// Basic kana with voicing marks, including the half-voiced p row.
+  voiced,
+
+  /// A kana followed by a small ya, yu or yo, read as one beat.
+  combination,
+}
+
 /// Kind-specific content of an [Item].
 @immutable
 sealed class ItemPayload {
@@ -19,6 +31,10 @@ class KanaPayload extends ItemPayload {
     required this.script,
     required this.romaji,
     this.alternativeRomaji = const [],
+    this.group = KanaGroup.basic,
+    this.row = '',
+    this._family,
+    this.lookalikes = const [],
   });
 
   final String character;
@@ -29,6 +45,21 @@ class KanaPayload extends ItemPayload {
 
   /// Other romanisations accepted in typed answers, e.g. "si".
   final List<String> alternativeRomaji;
+
+  final KanaGroup group;
+
+  /// The consonant line the kana belongs to, for example "k" or "ky".
+  /// Empty when unknown.
+  final String row;
+
+  final String? _family;
+
+  /// The reading of the unvoiced basic form. Kana that share a family
+  /// are partners: か and が, or は, ば and ぱ.
+  String get family => _family ?? romaji;
+
+  /// Characters of the same script that are easily mistaken for this one.
+  final List<String> lookalikes;
 
   List<String> get acceptedRomaji => [romaji, ...alternativeRomaji];
 }

@@ -11,9 +11,14 @@ abstract interface class ItemRepository {
 
   Future<Item?> getItem(int id);
 
-  /// Inserts seed items and their default mnemonics. Items whose key
-  /// already exists are left untouched, so this is safe to repeat.
-  Future<void> insertSeedItems(List<SeedItem> seedItems);
+  /// Brings the stored items in line with [seedItems], which is content
+  /// that ships with the app.
+  ///
+  /// Adds items whose key is missing. For items already stored, updates
+  /// the payload, teaching order and default mnemonic when they differ.
+  /// Never changes learner data (introduced dates, own mnemonics, cards)
+  /// and never removes an item.
+  Future<void> syncSeedItems(List<SeedItem> seedItems);
 
   /// Marks items as introduced by a lesson at [at].
   Future<void> markIntroduced(List<int> itemIds, DateTime at);

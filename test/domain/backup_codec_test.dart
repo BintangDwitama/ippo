@@ -11,6 +11,7 @@ import 'package:ippo/domain/models/review_card.dart';
 import 'package:ippo/domain/models/scheduling_state.dart';
 
 import '../support/backup_builders.dart';
+import '../support/seed_items.dart';
 
 void main() {
   const codec = BackupCodec();
@@ -109,6 +110,47 @@ void main() {
       const ReminderTime(hour: 19, minute: 30),
     );
     expect(snapshot.settings.appearanceMode, AppearanceMode.paper);
+  });
+
+  test('reads a version 2 file with voiced and combination kana', () {
+    final text = File('test/fixtures/backup_v2.json').readAsStringSync();
+
+    final snapshot = codec.decode(text);
+
+    expect(
+      snapshot.introducedItems.map((i) => i.key),
+      containsAll(['hiragana:a', 'hiragana:di', 'hiragana:kya']),
+    );
+    expect(snapshot.cards.last.itemKey, 'hiragana:kya');
+    expect(snapshot.goals.last.targetSet, GoalTargetSet.hiraganaExtended);
+    expect(snapshot.goals.first.targetSet, GoalTargetSet.hiragana);
+  });
+
+  test('writes version 2 and round-trips the new goal target sets', () {
+    final original = codec.decode(
+      File('test/fixtures/backup_v2.json').readAsStringSync(),
+    );
+
+    final text = codec.encode(original);
+
+    expect(text, contains('"formatVersion":2'));
+    expect(
+      codec.decode(text).goals.map((g) => g.targetSet),
+      [GoalTargetSet.hiragana, GoalTargetSet.hiraganaExtended],
+    );
+  });
+
+  test('a version 1 hiragana goal still means the 46 basic hiragana', () {
+    final snapshot = codec.decode(
+      File('test/fixtures/backup_v1.json').readAsStringSync(),
+    );
+    final target = snapshot.goals.single.targetSet;
+
+    expect(target, GoalTargetSet.hiragana);
+    expect(
+      [for (final item in seedKanaItems()) item.kana].where(target.includes),
+      hasLength(46),
+    );
   });
 
   group('refuses', () {

@@ -53,7 +53,7 @@ void main() {
     reviews = DriftReviewRepository(db);
     goals = DriftGoalRepository(db);
     settings = DriftSettingsRepository(db);
-    await items.insertSeedItems([
+    await items.syncSeedItems([
       _seed('i', 'い', 1),
       _seed('a', 'あ', 0),
       _seed('shi', 'し', 11),
@@ -72,7 +72,7 @@ void main() {
     });
 
     test('seeding the same keys twice does not duplicate', () async {
-      await items.insertSeedItems([_seed('a', 'あ', 0), _seed('u', 'う', 2)]);
+      await items.syncSeedItems([_seed('a', 'あ', 0), _seed('u', 'う', 2)]);
 
       expect(await items.getItems(), hasLength(4));
     });

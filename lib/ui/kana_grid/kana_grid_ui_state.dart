@@ -10,12 +10,24 @@ class KanaCell {
   final KanaStatus status;
 }
 
+/// The kana of one group, laid out as a table.
+@immutable
+class KanaSection {
+  const KanaSection({required this.group, required this.rows});
+
+  final KanaGroup group;
+
+  /// One row per consonant line. Each row has
+  /// [KanaGridUiState.columns] entries; null marks a gap.
+  final List<List<KanaCell?>> rows;
+}
+
 @immutable
 class KanaGridUiState {
   const KanaGridUiState({
     this.isLoading = true,
     this.script = KanaScript.hiragana,
-    this.rows = const [],
+    this.sections = const [],
     this.knownCount = 0,
     this.learningCount = 0,
     this.totalCount = 0,
@@ -27,8 +39,9 @@ class KanaGridUiState {
   final bool isLoading;
   final KanaScript script;
 
-  /// The gojūon table. Each row has [columns] entries; null marks a gap.
-  final List<List<KanaCell?>> rows;
+  /// The selected script's kana by group: basic, voiced, combination.
+  /// Groups without kana are left out.
+  final List<KanaSection> sections;
 
   final int knownCount;
   final int learningCount;

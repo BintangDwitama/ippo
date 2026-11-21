@@ -35,28 +35,55 @@ class DriftItemRepository implements ItemRepository {
   }
 
   @override
-  Future<void> insertSeedItems(List<SeedItem> seedItems) {
+  Future<void> syncSeedItems(List<SeedItem> seedItems) {
     return _db.transaction(() async {
-      for (final seed in seedItems) {
-        final existing = await (_db.select(_db.items)
-              ..where((t) => t.itemKey.equals(seed.key)))
-            .getSingleOrNull();
-        if (existing != null) continue;
+      final existing = {
+        for (final row in await _db.select(_db.items).get()) row.itemKey: row,
+      };
+      final defaults = {
+        for (final row in await _db.select(_db.mnemonics).get())
+          row.itemId: row.defaultText,
+      };
 
-        final id = await _db.into(_db.items).insert(
-              ItemsCompanion.insert(
-                kind: seed.kind,
-                itemKey: seed.key,
-                payload: _payloadMapper.encode(seed.payload),
-                sortOrder: seed.sortOrder,
-              ),
-            );
-        await _db.into(_db.mnemonics).insert(
-              MnemonicsCompanion.insert(
-                itemId: Value(id),
-                defaultText: seed.defaultMnemonic,
-              ),
-            );
+      for (final seed in seedItems) {
+        final payload = _payloadMapper.encode(seed.payload);
+        final row = existing[seed.key];
+        if (row == null) {
+          final id = await _db.into(_db.items).insert(
+                ItemsCompanion.insert(
+                  kind: seed.kind,
+                  itemKey: seed.key,
+                  payload: payload,
+                  sortOrder: seed.sortOrder,
+                ),
+              );
+          await _db.into(_db.mnemonics).insert(
+                MnemonicsCompanion.insert(
+                  itemId: Value(id),
+                  defaultText: seed.defaultMnemonic,
+                ),
+              );
+          continue;
+        }
+
+        // Only write what differs, so a launch with nothing new changes
+        // nothing and wakes no listeners.
+        if (row.payload != payload || row.sortOrder != seed.sortOrder) {
+          await (_db.update(_db.items)..where((t) => t.id.equals(row.id)))
+              .write(
+            ItemsCompanion(
+              payload: Value(payload),
+              sortOrder: Value(seed.sortOrder),
+            ),
+          );
+        }
+        if (defaults[row.id] != seed.defaultMnemonic) {
+          await (_db.update(_db.mnemonics)
+                ..where((t) => t.itemId.equals(row.id)))
+              .write(
+            MnemonicsCompanion(defaultText: Value(seed.defaultMnemonic)),
+          );
+        }
       }
     });
   }

@@ -26,6 +26,10 @@ Item kanaItem({
   List<String> alternatives = const [],
   int? sortOrder,
   DateTime? introducedAt,
+  KanaGroup group = KanaGroup.basic,
+  String row = '',
+  String? family,
+  List<String> lookalikes = const [],
 }) {
   return Item(
     id: id,
@@ -37,6 +41,10 @@ Item kanaItem({
       script: script,
       romaji: romaji,
       alternativeRomaji: alternatives,
+      group: group,
+      row: row,
+      family: family,
+      lookalikes: lookalikes,
     ),
     introducedAt: introducedAt,
   );
@@ -66,7 +74,9 @@ List<Item> kanaItems({
           : '${isHiragana ? 'h' : 'k'}$index',
       romaji: index < real.length ? real[index].$2 : 'r$index',
       script: script,
-      sortOrder: index + (isHiragana ? 0 : 100),
+      sortOrder: index + (isHiragana ? 0 : 1000),
+      // Rows of five, as in the basic table.
+      row: 'r${index ~/ 5}',
       introducedAt: position < introduced ? at : null,
     );
     position++;

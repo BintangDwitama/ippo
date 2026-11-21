@@ -49,7 +49,7 @@ class _Install {
   late final DriftBackupRepository backups;
 
   Future<void> seed() {
-    return items.insertSeedItems([
+    return items.syncSeedItems([
       for (var i = 0; i < _kana.length; i++)
         SeedItem(
           kind: ItemKind.kana,

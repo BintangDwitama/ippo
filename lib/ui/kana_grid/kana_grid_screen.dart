@@ -51,22 +51,38 @@ class KanaGridScreen extends StatelessWidget {
                       ),
                 ),
                 Gaps.medium,
-                for (final row in state.rows)
+                for (final section in state.sections) ...[
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Row(
-                      children: [
-                        for (var i = 0; i < row.length; i++) ...[
-                          if (i > 0) const SizedBox(width: 8),
-                          Expanded(
-                            child: row[i] == null
-                                ? const SizedBox.shrink()
-                                : _StatusTile(cell: row[i]!),
-                          ),
-                        ],
-                      ],
+                    padding: const EdgeInsets.only(top: 8, bottom: 12),
+                    child: Semantics(
+                      header: true,
+                      child: Text(
+                        switch (section.group) {
+                          KanaGroup.basic => 'Basic',
+                          KanaGroup.voiced => 'Voiced',
+                          KanaGroup.combination => 'Combination',
+                        },
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
                     ),
                   ),
+                  for (final row in section.rows)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Row(
+                        children: [
+                          for (var i = 0; i < row.length; i++) ...[
+                            if (i > 0) const SizedBox(width: 8),
+                            Expanded(
+                              child: row[i] == null
+                                  ? const SizedBox.shrink()
+                                  : _StatusTile(cell: row[i]!),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                ],
               ],
             ),
     );

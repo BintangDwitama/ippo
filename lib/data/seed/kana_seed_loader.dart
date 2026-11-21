@@ -4,7 +4,7 @@ import 'package:ippo/data/repositories/item_repository.dart';
 import 'package:ippo/domain/models/item.dart';
 import 'package:ippo/domain/models/seed_item.dart';
 
-/// Loads the bundled kana into the database on first launch.
+/// Brings the kana in the database in line with the bundled seed file.
 class KanaSeedLoader {
   KanaSeedLoader({
     required this._itemRepository,
@@ -16,10 +16,11 @@ class KanaSeedLoader {
   final ItemRepository _itemRepository;
   final Future<String> Function() _loadSeedJson;
 
-  /// Inserts any kana not yet in the database. Safe to call on every launch.
+  /// Adds kana that are missing and updates the content of those already
+  /// there. Never touches learner data. Safe to call on every launch.
   Future<void> seed() async {
     final seedItems = parse(await _loadSeedJson());
-    await _itemRepository.insertSeedItems(seedItems);
+    await _itemRepository.syncSeedItems(seedItems);
   }
 
   /// Throws [FormatException] if [json] is not a valid kana seed file.
@@ -41,23 +42,46 @@ class KanaSeedLoader {
     final alt = entry['alt'];
     final order = entry['order'];
     final mnemonic = entry['mnemonic'];
+    final group = entry['group'];
+    final row = entry['row'];
+    final family = entry['family'];
+    final lookalikes = entry['lookalikes'];
+    // Stated only where two kana of a script share a reading.
+    final key = entry['key'];
     if (script is! String ||
         character is! String ||
         romaji is! String ||
         alt is! List<Object?> ||
         order is! int ||
-        mnemonic is! String) {
+        mnemonic is! String ||
+        group is! String ||
+        row is! String ||
+        family is! String ||
+        lookalikes is! List<Object?> ||
+        key is! String?) {
+      throw FormatException('Invalid kana seed entry: $entry');
+    }
+    final KanaGroup kanaGroup;
+    final KanaScript kanaScript;
+    try {
+      kanaGroup = KanaGroup.values.byName(group);
+      kanaScript = KanaScript.values.byName(script);
+    } on ArgumentError {
       throw FormatException('Invalid kana seed entry: $entry');
     }
     return SeedItem(
       kind: ItemKind.kana,
-      key: '$script:$romaji',
+      key: key ?? '$script:$romaji',
       sortOrder: order,
       payload: KanaPayload(
         character: character,
-        script: KanaScript.values.byName(script),
+        script: kanaScript,
         romaji: romaji,
         alternativeRomaji: alt.cast<String>().toList(growable: false),
+        group: kanaGroup,
+        row: row,
+        family: family,
+        lookalikes: lookalikes.cast<String>().toList(growable: false),
       ),
       defaultMnemonic: mnemonic,
     );

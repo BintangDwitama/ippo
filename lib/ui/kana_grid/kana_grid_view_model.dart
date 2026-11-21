@@ -59,7 +59,16 @@ class KanaGridViewModel extends ViewModel {
     _uiState = KanaGridUiState(
       isLoading: false,
       script: _script,
-      rows: _toRows(cells),
+      sections: [
+        for (final group in KanaGroup.values)
+          if (cells.any((c) => c.item.kana.group == group))
+            KanaSection(
+              group: group,
+              rows: _toRows(
+                cells.where((c) => c.item.kana.group == group).toList(),
+              ),
+            ),
+      ],
       knownCount: cells.where((c) => c.status == KanaStatus.known).length,
       learningCount:
           cells.where((c) => c.status == KanaStatus.learning).length,
@@ -68,18 +77,26 @@ class KanaGridViewModel extends ViewModel {
     notify();
   }
 
-  /// Lays the cells out as the gojūon table: one row per consonant, one
+  /// Lays the cells out as a table: one row per consonant line, one
   /// column per vowel, with gaps where a sound does not exist.
   List<List<KanaCell?>> _toRows(List<KanaCell> cells) {
     final rows = <List<KanaCell?>>[];
+    String? currentRow;
     var lastColumn = KanaGridUiState.columns;
     for (final cell in cells) {
-      final column = _column(cell.item.kana.romaji);
-      if (column <= lastColumn) {
+      final kana = cell.item.kana;
+      final column = _column(kana.romaji);
+      // A kana starts a new table row when its consonant line changes.
+      // Where the line is unknown, a vowel that does not advance does.
+      final startsRow = kana.row.isEmpty
+          ? column <= lastColumn
+          : kana.row != currentRow;
+      if (startsRow || rows.isEmpty) {
         rows.add(List<KanaCell?>.filled(KanaGridUiState.columns, null));
       }
       rows.last[column] = cell;
       lastColumn = column;
+      currentRow = kana.row;
     }
     return rows;
   }

@@ -12,6 +12,7 @@ class GoalUiState {
     this.targetSet = SaveGoal.presetTargetSet,
     this.accuracyPercent = 90,
     this.deadlineDays = SaveGoal.presetDeadlineDays,
+    this.targetCounts = const {},
     this.error,
     this.isSaved = false,
   });
@@ -26,6 +27,9 @@ class GoalUiState {
   final GoalTargetSet targetSet;
   final int accuracyPercent;
   final int deadlineDays;
+
+  /// How many kana each target set covers.
+  final Map<GoalTargetSet, int> targetCounts;
 
   /// Why the last save was rejected, if it was.
   final GoalValidationError? error;
@@ -52,6 +56,7 @@ class GoalUiState {
       targetSet: targetSet ?? this.targetSet,
       accuracyPercent: accuracyPercent ?? this.accuracyPercent,
       deadlineDays: deadlineDays ?? this.deadlineDays,
+      targetCounts: targetCounts,
       error: clearError ? null : error ?? this.error,
       isSaved: isSaved ?? this.isSaved,
     );

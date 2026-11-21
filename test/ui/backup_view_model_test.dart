@@ -185,9 +185,12 @@ void main() {
     });
 
     test('refuses a backup from a newer version', () async {
-      final text = codec
-          .encode(fullSnapshot())
-          .replaceFirst('"formatVersion":1', '"formatVersion":2');
+      const current = BackupCodec.formatVersion;
+      final text = codec.encode(fullSnapshot()).replaceFirst(
+            '"formatVersion":$current',
+            '"formatVersion":${current + 1}',
+          );
+      expect(text, contains('"formatVersion":${current + 1}'));
 
       expect(
         await noticeAfterPicking((d) => d.backupFiles.fileToPick = text),

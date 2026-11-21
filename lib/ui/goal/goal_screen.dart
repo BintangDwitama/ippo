@@ -11,6 +11,17 @@ import 'package:provider/provider.dart';
 class GoalScreen extends StatelessWidget {
   const GoalScreen({super.key});
 
+  /// The choices as the learner meets them: along the teaching path
+  /// first, then the two that span it.
+  static const List<GoalTargetSet> _targetsInPathOrder = [
+    GoalTargetSet.hiragana,
+    GoalTargetSet.hiraganaExtended,
+    GoalTargetSet.katakana,
+    GoalTargetSet.katakanaExtended,
+    GoalTargetSet.both,
+    GoalTargetSet.everything,
+  ];
+
   Future<void> _save(BuildContext context) async {
     final viewModel = context.read<GoalViewModel>();
     await viewModel.save();
@@ -41,25 +52,13 @@ class GoalScreen extends StatelessWidget {
                 Gaps.medium,
                 Text('Which kana', style: theme.textTheme.titleMedium),
                 Gaps.small,
-                SegmentedButton<GoalTargetSet>(
-                  segments: const [
-                    ButtonSegment(
-                      value: GoalTargetSet.hiragana,
-                      label: Text('Hiragana'),
-                    ),
-                    ButtonSegment(
-                      value: GoalTargetSet.katakana,
-                      label: Text('Katakana'),
-                    ),
-                    ButtonSegment(
-                      value: GoalTargetSet.both,
-                      label: Text('Both'),
-                    ),
-                  ],
-                  selected: {state.targetSet},
-                  onSelectionChanged: (selection) =>
-                      viewModel.setTargetSet(selection.first),
-                ),
+                for (final target in _targetsInPathOrder)
+                  _TargetOption(
+                    target: target,
+                    count: state.targetCounts[target] ?? 0,
+                    isSelected: target == state.targetSet,
+                    onSelected: () => viewModel.setTargetSet(target),
+                  ),
                 Gaps.large,
                 Text(
                   'Accuracy to reach: ${state.accuracyPercent}%',
@@ -107,24 +106,66 @@ class GoalScreen extends StatelessWidget {
                 ),
                 if (state.error != null) ...[
                   Gaps.medium,
-                  Text(
-                    switch (state.error!) {
-                      GoalValidationError.deadlineTooShort =>
-                        'The goal needs at least one day.',
-                      GoalValidationError.accuracyOutOfRange =>
-                        'Accuracy must be between 50% and 100%.',
-                    },
-                    style: TextStyle(color: theme.colorScheme.error),
-                  ),
+                  Text(switch (state.error!) {
+                    GoalValidationError.deadlineTooShort =>
+                      'The goal needs at least one day.',
+                    GoalValidationError.accuracyOutOfRange =>
+                      'Accuracy must be between 50% and 100%.',
+                  }, style: TextStyle(color: theme.colorScheme.error)),
                 ],
                 Gaps.large,
                 PrimaryButton(
-                  label:
-                      state.startsNewGoal ? 'Start this goal' : 'Save changes',
+                  label: state.startsNewGoal
+                      ? 'Start this goal'
+                      : 'Save changes',
                   onPressed: () => _save(context),
                 ),
               ],
             ),
+    );
+  }
+}
+
+/// One choice of which kana the goal covers; exactly one is selected.
+class _TargetOption extends StatelessWidget {
+  const _TargetOption({
+    required this.target,
+    required this.count,
+    required this.isSelected,
+    required this.onSelected,
+  });
+
+  final GoalTargetSet target;
+  final int count;
+  final bool isSelected;
+  final VoidCallback onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final title = switch (target) {
+      GoalTargetSet.hiragana => 'Hiragana basics',
+      GoalTargetSet.hiraganaExtended => 'Hiragana voiced and combination',
+      GoalTargetSet.katakana => 'Katakana basics',
+      GoalTargetSet.katakanaExtended => 'Katakana voiced and combination',
+      GoalTargetSet.both => 'Both basic sets',
+      GoalTargetSet.everything => 'All kana',
+    };
+    return Semantics(
+      inMutuallyExclusiveGroup: true,
+      checked: isSelected,
+      child: ListTile(
+        contentPadding: EdgeInsets.zero,
+        leading: Icon(
+          isSelected
+              ? Icons.radio_button_checked
+              : Icons.radio_button_unchecked,
+          color: isSelected ? scheme.primary : scheme.onSurfaceVariant,
+        ),
+        title: Text(title),
+        subtitle: Text('$count kana'),
+        onTap: onSelected,
+      ),
     );
   }
 }
@@ -170,13 +211,14 @@ class _StatusBanner extends StatelessWidget {
             accuracy == null
                 ? 'No reviews in the last 7 days'
                 : 'Accuracy over the last 7 days: '
-                    '${(accuracy * 100).round()}%',
+                      '${(accuracy * 100).round()}%',
           ),
           Gaps.small,
           Text(
             hint,
-            style: theme.textTheme.bodyMedium
-                ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),

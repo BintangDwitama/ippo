@@ -13,17 +13,24 @@ class KanaText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      character,
-      locale: const Locale('ja'),
-      textAlign: TextAlign.center,
-      // Already display-sized; scaling it further only causes clipping.
-      textScaler: TextScaler.noScaling,
-      style: TextStyle(
-        fontFamily: context.tokens.kanaFontFamily,
-        fontSize: size,
-        height: 1.15,
-        color: color ?? Theme.of(context).colorScheme.onSurface,
+    // Scaled down when the space is narrower than the text, so a
+    // two-character kana stays on one line.
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Text(
+        character,
+        locale: const Locale('ja'),
+        textAlign: TextAlign.center,
+        maxLines: 1,
+        softWrap: false,
+        // Already display-sized; scaling it further only causes clipping.
+        textScaler: TextScaler.noScaling,
+        style: TextStyle(
+          fontFamily: context.tokens.kanaFontFamily,
+          fontSize: size,
+          height: 1.15,
+          color: color ?? Theme.of(context).colorScheme.onSurface,
+        ),
       ),
     );
   }

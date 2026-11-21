@@ -45,7 +45,11 @@ class BackupCodec {
   static const String formatName = 'ippo-backup';
 
   /// The version this app writes, and the newest it can read.
-  static const int formatVersion = 1;
+  ///
+  /// Version 2 has the structure of version 1. The number was raised when
+  /// voiced and combination kana arrived, so that an older app refuses a
+  /// newer file as "needs a newer version" and not as damaged.
+  static const int formatVersion = 2;
 
   String encode(BackupSnapshot snapshot) {
     return jsonEncode({
@@ -142,7 +146,7 @@ class BackupCodec {
     }
 
     try {
-      return _decodeVersion1(root);
+      return _decodeSnapshot(root);
     } on BackupFormatException {
       rethrow;
     } on Object catch (error) {
@@ -151,7 +155,7 @@ class BackupCodec {
     }
   }
 
-  BackupSnapshot _decodeVersion1(Map<String, Object?> root) {
+  BackupSnapshot _decodeSnapshot(Map<String, Object?> root) {
     final cards = [
       for (final entry in _list(root, 'cards')) _decodeCard(_map(entry)),
     ];

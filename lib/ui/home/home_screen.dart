@@ -170,9 +170,9 @@ class _NextLessonCard extends StatelessWidget {
   /// Null when the lesson is started from the primary action instead.
   final VoidCallback? onStart;
 
-  /// A full lesson; shorter lessons leave empty cells so tiles keep
-  /// their size.
-  static const int _columns = 5;
+  /// Shorter lessons leave empty cells so tiles keep their usual size;
+  /// a lesson of six uses six narrower ones.
+  static const int _minColumns = 5;
 
   @override
   Widget build(BuildContext context) {
@@ -199,7 +199,9 @@ class _NextLessonCard extends StatelessWidget {
           Gaps.medium,
           Row(
             children: [
-              for (var i = 0; i < _columns; i++) ...[
+              for (var i = 0;
+                  i < (kana.length > _minColumns ? kana.length : _minColumns);
+                  i++) ...[
                 if (i > 0) const SizedBox(width: 8),
                 Expanded(
                   child: i < kana.length

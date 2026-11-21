@@ -116,6 +116,14 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('New goal'), findsOneWidget);
 
+    expect(find.text('Hiragana basics'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Start this goal'),
+      200,
+      scrollable: find.byType(Scrollable).last,
+    );
+    await tester.ensureVisible(find.text('Start this goal'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Start this goal'));
     await tester.pumpAndSettle();
     expect(find.text('14 days left'), findsOneWidget);

@@ -13,6 +13,10 @@ class ItemPayloadMapper {
           'script': payload.script.name,
           'romaji': payload.romaji,
           'alt': payload.alternativeRomaji,
+          'group': payload.group.name,
+          'row': payload.row,
+          'family': payload.family,
+          'lookalikes': payload.lookalikes,
         }),
     };
   }
@@ -33,10 +37,20 @@ class ItemPayloadMapper {
     final script = map['script'];
     final romaji = map['romaji'];
     final alt = map['alt'] ?? const <Object?>[];
+    // Payloads stored before groups existed lack the next four fields;
+    // they describe basic kana.
+    final group = map['group'] ?? KanaGroup.basic.name;
+    final row = map['row'] ?? '';
+    final family = map['family'];
+    final lookalikes = map['lookalikes'] ?? const <Object?>[];
     if (character is! String ||
         script is! String ||
         romaji is! String ||
-        alt is! List<Object?>) {
+        alt is! List<Object?> ||
+        group is! String ||
+        row is! String ||
+        family is! String? ||
+        lookalikes is! List<Object?>) {
       throw const FormatException('Invalid kana payload');
     }
     return KanaPayload(
@@ -44,6 +58,10 @@ class ItemPayloadMapper {
       script: KanaScript.values.byName(script),
       romaji: romaji,
       alternativeRomaji: alt.cast<String>().toList(growable: false),
+      group: KanaGroup.values.byName(group),
+      row: row,
+      family: family,
+      lookalikes: lookalikes.cast<String>().toList(growable: false),
     );
   }
 }

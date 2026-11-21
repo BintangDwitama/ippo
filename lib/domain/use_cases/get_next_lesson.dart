@@ -9,12 +9,17 @@ class GetNextLesson {
     this._calculateDailyQuota = const CalculateDailyQuota(),
   });
 
-  static const int maxBatchSize = 5;
+  /// The most kana one lesson introduces.
+  static const int maxBatchSize = 6;
+
+  /// Lesson size for kana whose row is unknown.
+  static const int _unknownRowBatchSize = 5;
 
   final CalculateDailyQuota _calculateDailyQuota;
 
-  /// The next batch of up to [maxBatchSize] kana to introduce, in teaching
-  /// order. Empty when today's quota is used up or nothing is left.
+  /// The next lesson: whole rows of kana in teaching order, up to
+  /// [maxBatchSize] kana, never mixing scripts or groups. Empty when
+  /// today's quota is used up or nothing is left.
   ///
   /// With an active [goal], lessons cover the goal's kana and the quota
   /// comes from its deadline; otherwise all kana at a default pace.
@@ -29,7 +34,7 @@ class GetNextLesson {
     final kana = items.where((item) => item.kind == ItemKind.kana).where(
           (item) =>
               activeGoal == null ||
-              activeGoal.targetSet.includes(item.kana.script),
+              activeGoal.targetSet.includes(item.kana),
         );
     final candidates = kana.where((item) => !item.isIntroduced).toList()
       ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
@@ -53,9 +58,37 @@ class GetNextLesson {
       );
     }
 
-    // The quota decides whether a lesson is offered; a lesson is always a
-    // full batch, so kana are taught in their natural rows of five.
+    // The quota decides whether a lesson is offered, not its size: a
+    // lesson is always whole rows, so kana are taught as they belong.
     if (remainingToday <= 0) return const [];
-    return candidates.take(maxBatchSize).toList();
+    return _cutLesson(candidates);
+  }
+
+  /// Takes what is left of the first row, then following rows of the same
+  /// script and group for as long as the lesson stays within the limit.
+  List<Item> _cutLesson(List<Item> candidates) {
+    if (candidates.isEmpty) return const [];
+    final first = candidates.first.kana;
+    if (first.row.isEmpty) {
+      return candidates.take(_unknownRowBatchSize).toList();
+    }
+
+    final rows = <List<Item>>[];
+    for (final item in candidates) {
+      final kana = item.kana;
+      if (kana.script != first.script || kana.group != first.group) break;
+      if (rows.isNotEmpty && rows.last.first.kana.row == kana.row) {
+        rows.last.add(item);
+      } else {
+        rows.add([item]);
+      }
+    }
+
+    final lesson = [...rows.first];
+    for (final row in rows.skip(1)) {
+      if (lesson.length + row.length > maxBatchSize) break;
+      lesson.addAll(row);
+    }
+    return lesson;
   }
 }

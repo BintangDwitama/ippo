@@ -1,0 +1,62 @@
+## MODIFIED Requirements
+
+### Requirement: Seeded kana set
+The system SHALL ship with 208 kana available without any network access: for each of hiragana and katakana, the 46 basic kana, the 25 voiced kana (including the 5 half-voiced), and the 33 combination kana. Each kana SHALL have its character, its script, its group (basic, voiced or combination), its row, its romaji reading, its position in the teaching order, and a default mnemonic. Kana that share a reading within a script (for example じ and ぢ) SHALL both be present.
+
+Seeding SHALL add kana that are missing and SHALL bring the reading, group, row, teaching order and default mnemonic of existing kana up to date with the app. Seeding SHALL NOT change which kana the learner has been introduced to, their cards, their review history, their goals or their own mnemonics.
+
+#### Scenario: First launch offline
+- **WHEN** the app is launched for the first time with no network connection
+- **THEN** all 208 kana are available with character, reading, group and default mnemonic
+
+#### Scenario: Seeding happens once
+- **WHEN** the app is launched again after the kana have been seeded
+- **THEN** no kana are duplicated and existing learner progress is unchanged
+
+#### Scenario: Update from the basic set
+- **WHEN** a learner with 10 basic hiragana introduced, 20 cards and 30 reviews updates from a version with 92 kana
+- **THEN** 208 kana exist, the same 10 are introduced, and the cards and reviews are unchanged
+
+#### Scenario: Same reading, different kana
+- **WHEN** the kana have been seeded
+- **THEN** both じ and ぢ exist as separate hiragana, each read "ji"
+
+#### Scenario: Improved default mnemonic
+- **WHEN** the app is updated with a different default mnemonic for a kana whose mnemonic the learner has not edited
+- **THEN** the new default is shown for that kana
+- **AND** a kana whose mnemonic the learner has edited still shows the learner's text
+
+### Requirement: Kana grid
+The system SHALL show a grid of all kana for each script, divided into three sections: basic, voiced and combination, each in row order. Each kana SHALL be marked by learning status: not started, learning, or known. A kana SHALL be "not started" until it has been introduced in a lesson, "known" when all its cards have reached the review state with a stability of at least 21 days, and "learning" otherwise.
+
+#### Scenario: Fresh install
+- **WHEN** the learner opens the kana grid before taking any lesson
+- **THEN** all 104 kana of the selected script are shown as not started, in three sections of 46, 25 and 33
+
+#### Scenario: Status after a lesson
+- **WHEN** the learner completes a lesson introducing five kana and opens the grid
+- **THEN** those five kana are shown as learning and the rest as not started
+
+#### Scenario: Open kana detail
+- **WHEN** the learner taps a kana in the grid
+- **THEN** the character, reading, current mnemonic and an audio button are shown
+
+## ADDED Requirements
+
+### Requirement: Voiced and combination kana are taught as rules
+The default mnemonic of a voiced, half-voiced or combination kana SHALL state the rule that forms it, naming the basic kana it is built from and the resulting sound.
+
+#### Scenario: Voiced kana
+- **WHEN** が is presented in a lesson
+- **THEN** its mnemonic says that it is か with two marks and that the k sound becomes g
+
+#### Scenario: Combination kana
+- **WHEN** きゃ is presented in a lesson
+- **THEN** its mnemonic says that it is き with a small や, read "kya"
+
+### Requirement: Two-character kana are shown whole
+Wherever a kana is displayed large, a combination kana SHALL be shown on one line and SHALL NOT be clipped, on any supported screen size.
+
+#### Scenario: Combination kana on a small screen
+- **WHEN** きゃ is shown as a review question on a 360 by 640 logical pixel screen
+- **THEN** both characters appear side by side on one line, fully visible

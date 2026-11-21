@@ -164,6 +164,17 @@ The date of the last export is stored under the settings key `last_export_at`. I
 - **The confirm button uses the theme's error colours**, which were added to the contrast test.
 - **Goal dates and time zones.** A goal's deadline is stored as an instant. Restoring on a phone in another time zone keeps the instant, so the deadline's local time of day shifts. Accepted.
 
+### 12. Results on the phone (Samsung SM S731B, Android 16), 21 Nov 2026
+
+- **File picker (task 1.1): works.** Export opened the system save dialog in Downloads with the name `ippo-backup-2026-11-21.json` filled in; the saved file is valid JSON with the expected counts. Import opened the system open dialog and read the file back. No fallback package is needed.
+- **Database folder (task 1.2): confirmed.** The file is `app_flutter/ippo.sqlite` under the app's data root, as the backup rules assume. SQLite runs in `delete` journal mode, so there are no write-ahead files to lose.
+- **Export and import round trip (task 9.3): passed.** After an export, one more review was answered (31 reviews, 9 cards due). The import's summary showed 30 in the file against 31 on the phone; after confirming, the home screen showed 10 cards due again without a restart. A copy of the database taken before the test and one taken after are identical in every table once row ids are ignored.
+- **Row ids change on restore.** Cards, reviews and goals get new ids, because SQLite does not reuse the ids of deleted rows. Nothing depends on the old ids.
+- **Wrong file (task 9.4): passed.** A text file was refused with "Not an Ippo backup" and the review count did not change.
+- **Reminder (task 9.6): passed, checked through the alarm list, not by waiting for a notification.** With notifications blocked, restoring a backup that has the reminder at 19:00 left no reminder stored, scheduled no alarm, and showed no permission dialog. With notifications allowed, the same restore stored the reminder and scheduled an alarm for 19:00 the next day. Restoring a backup without a reminder removed the alarm.
+- **Release build (task 9.7): passed.** It installed over the existing app and started with the data intact.
+- **Android backup is turned off on this phone.** `bmgr enabled` reports the backup manager as disabled, so the automatic layer is not protecting this phone today, whatever the app declares. Task 9.5 cannot pass until backup is turned on in the phone's settings.
+
 ## Risks / Trade-offs
 
 - **Android's automatic backup may not restore on this phone** (backup switched off, or Samsung-specific behaviour) → It is tested with a real uninstall and reinstall. If it fails and cannot be fixed, the screen's note is changed to say so and a reminder to export is proposed as a follow-up.

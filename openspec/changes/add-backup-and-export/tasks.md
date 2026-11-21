@@ -1,7 +1,7 @@
 ## 1. Early checks
 
-- [ ] 1.1 Spike: with `file_picker`, save a text file to a chosen location and read it back on the Android phone; record the result in design.md, and switch to `flutter_file_dialog` if saving does not work
-- [ ] 1.2 Find where the database file and its write-ahead files are stored on the phone (debug build, `adb shell run-as`), and record the folder in design.md
+- [x] 1.1 Spike: with `file_picker`, save a text file to a chosen location and read it back on the Android phone; record the result in design.md, and switch to `flutter_file_dialog` if saving does not work
+- [x] 1.2 Find where the database file and its write-ahead files are stored on the phone (debug build, `adb shell run-as`), and record the folder in design.md
 - [x] 1.3 Run `flutter analyze` and `flutter test` to confirm a clean baseline
 
 ## 2. Backup model and codec
@@ -58,8 +58,8 @@
 
 - [x] 9.1 Run `flutter analyze` and `flutter test`; fix all issues
 - [x] 9.2 Update README.md: the Backup screen, the backup file, and the rule to export before installing a build that may need an uninstall
-- [ ] 9.3 Manual, on the phone: export to Downloads; do a lesson or some reviews; import the file; confirm the state is the exported one and the app did not need a restart
-- [ ] 9.4 Manual, on the phone: import a text file that is not a backup and confirm it is refused with nothing changed
+- [x] 9.3 Manual, on the phone: export to Downloads; do a lesson or some reviews; import the file; confirm the state is the exported one and the app did not need a restart
+- [x] 9.4 Manual, on the phone: import a text file that is not a backup and confirm it is refused with nothing changed
 - [ ] 9.5 Copy the verified export file off the phone, then, with the owner's go-ahead: force an Android backup (`adb shell bmgr backupnow`), uninstall, reinstall, and confirm the data including the most recent review is back; record the result in design.md
-- [ ] 9.6 Manual, on the phone: with the reminder on, restore a backup and confirm the notification still arrives; with notifications blocked, confirm settings shows the reminder as off and no permission request appears
-- [ ] 9.7 Build a release APK and confirm it installs over the existing app and starts with data intact
+- [x] 9.6 Manual, on the phone: with the reminder on, restore a backup and confirm the notification still arrives; with notifications blocked, confirm settings shows the reminder as off and no permission request appears
+- [x] 9.7 Build a release APK and confirm it installs over the existing app and starts with data intact

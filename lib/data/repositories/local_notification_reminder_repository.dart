@@ -13,14 +13,25 @@ class LocalNotificationReminderRepository implements ReminderRepository {
   @override
   Future<bool> enableReminder(ReminderTime time) async {
     if (!await _notifications.requestPermission()) return false;
-    await _notifications.scheduleDaily(
+    await _schedule(time);
+    return true;
+  }
+
+  @override
+  Future<bool> rescheduleIfPermitted(ReminderTime time) async {
+    if (!await _notifications.isPermissionGranted()) return false;
+    await _schedule(time);
+    return true;
+  }
+
+  Future<void> _schedule(ReminderTime time) {
+    return _notifications.scheduleDaily(
       id: _reminderId,
       hour: time.hour,
       minute: time.minute,
       title: 'Time for one more step',
       body: 'Your kana reviews are waiting.',
     );
-    return true;
   }
 
   @override

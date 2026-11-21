@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ippo/domain/models/appearance_mode.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ippo/domain/models/reminder_time.dart';
+import 'package:ippo/routing/routes.dart';
 import 'package:ippo/ui/settings/settings_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -118,6 +120,22 @@ class SettingsScreen extends StatelessWidget {
                               'text-to-speech settings to hear the kana. '
                               'Listening reviews are paused until then.',
                   ),
+                ),
+                const Divider(),
+                const _SectionTitle('Your data'),
+                ListTile(
+                  leading: const Icon(Icons.save_alt),
+                  title: const Text('Backup and restore'),
+                  subtitle: const Text(
+                    'Save your progress to a file, or bring it back',
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () async {
+                    final viewModel = context.read<SettingsViewModel>();
+                    await context.push(Routes.backup);
+                    // An import may have changed the settings shown here.
+                    await viewModel.reload();
+                  },
                 ),
                 const Divider(),
                 ListTile(

@@ -27,4 +27,9 @@ abstract interface class SettingsRepository {
   Future<AppearanceMode> getAppearanceMode();
 
   Future<void> setAppearanceMode(AppearanceMode mode);
+
+  /// When this phone last exported a backup; null if it never has.
+  Future<DateTime?> getLastExportAt();
+
+  Future<void> setLastExportAt(DateTime time);
 }

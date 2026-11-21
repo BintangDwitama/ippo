@@ -6,6 +6,7 @@ abstract final class Routes {
   static const String kanaGrid = '/kana';
   static const String goal = '/goal';
   static const String settings = '/settings';
+  static const String backup = '/settings/backup';
 
   static String kanaDetail(int itemId) => '/kana/$itemId';
 }

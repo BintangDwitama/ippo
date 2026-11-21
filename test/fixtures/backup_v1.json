@@ -1,0 +1,73 @@
+{
+  "format": "ippo-backup",
+  "formatVersion": 1,
+  "exportedAt": "2026-11-21T02:15:00.000Z",
+  "items": [
+    { "key": "hiragana:a", "introducedAt": "2026-11-20T11:02:00.000Z" },
+    { "key": "hiragana:i", "introducedAt": "2026-11-20T11:02:00.000Z" }
+  ],
+  "mnemonics": [
+    { "key": "hiragana:a", "learnerText": "an apple with a stalk" }
+  ],
+  "cards": [
+    {
+      "key": "hiragana:a",
+      "promptType": "charToSoundChoice",
+      "phase": "review",
+      "step": null,
+      "due": "2026-11-25T11:30:00.000Z",
+      "stability": 4.25,
+      "difficulty": 5.5,
+      "lastReview": "2026-11-21T01:00:00.000Z",
+      "reps": 3,
+      "lapses": 1,
+      "consecutiveCorrect": 2,
+      "createdAt": "2026-11-20T11:02:00.000Z",
+      "reviews": [
+        {
+          "reviewedAt": "2026-11-20T11:05:00.000Z",
+          "rating": "again",
+          "wasCorrect": false,
+          "phaseBefore": "learning",
+          "elapsedDays": 0
+        },
+        {
+          "reviewedAt": "2026-11-21T01:00:00.000Z",
+          "rating": "good",
+          "wasCorrect": true,
+          "phaseBefore": "learning",
+          "elapsedDays": 1
+        }
+      ]
+    },
+    {
+      "key": "hiragana:i",
+      "promptType": "soundToCharChoice",
+      "phase": "learning",
+      "step": 0,
+      "due": "2026-11-20T11:12:00.000Z",
+      "stability": null,
+      "difficulty": null,
+      "lastReview": null,
+      "reps": 0,
+      "lapses": 0,
+      "consecutiveCorrect": 0,
+      "createdAt": "2026-11-20T11:02:00.000Z",
+      "reviews": []
+    }
+  ],
+  "goals": [
+    {
+      "targetSet": "hiragana",
+      "targetAccuracy": 0.9,
+      "createdAt": "2026-11-19T03:00:00.000Z",
+      "deadline": "2026-12-02T17:00:00.000Z",
+      "status": "active"
+    }
+  ],
+  "settings": {
+    "dailyReviewCap": 60,
+    "reminderTime": "19:30",
+    "appearanceMode": "paper"
+  }
+}

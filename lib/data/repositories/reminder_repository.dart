@@ -8,4 +8,9 @@ abstract interface class ReminderRepository {
   Future<bool> enableReminder(ReminderTime time);
 
   Future<void> disableReminder();
+
+  /// Schedules the reminder at [time] if notifications are already
+  /// allowed. Never asks for permission. Returns false, scheduling
+  /// nothing, if they are not allowed.
+  Future<bool> rescheduleIfPermitted(ReminderTime time);
 }

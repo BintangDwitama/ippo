@@ -8,3 +8,18 @@ String formatTimeUntil(DateTime time, DateTime now) {
   }
   return wait.inDays == 1 ? 'in 1 day' : 'in ${wait.inDays} days';
 }
+
+const _months = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+];
+
+/// A date and time in the learner's local time, for example
+/// "21 Nov 2026, 09:15".
+String formatDateTime(DateTime time) {
+  final local = time.toLocal();
+  final minutes = local.minute.toString().padLeft(2, '0');
+  final hours = local.hour.toString().padLeft(2, '0');
+  return '${local.day} ${_months[local.month - 1]} ${local.year}, '
+      '$hours:$minutes';
+}

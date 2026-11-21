@@ -10,6 +10,7 @@ class DriftSettingsRepository implements SettingsRepository {
   static const _reminderMinutes = 'reminder_minutes';
   static const _voiceNoticeShown = 'voice_notice_shown';
   static const _appearanceMode = 'appearance_mode';
+  static const _lastExportAt = 'last_export_at';
 
   final AppDatabase _db;
 
@@ -73,6 +74,17 @@ class DriftSettingsRepository implements SettingsRepository {
   @override
   Future<void> setAppearanceMode(AppearanceMode mode) {
     return _write(_appearanceMode, mode.name);
+  }
+
+  @override
+  Future<DateTime?> getLastExportAt() async {
+    final value = await _read(_lastExportAt);
+    return value == null ? null : DateTime.tryParse(value);
+  }
+
+  @override
+  Future<void> setLastExportAt(DateTime time) {
+    return _write(_lastExportAt, time.toUtc().toIso8601String());
   }
 
   Future<String?> _read(String name) async {

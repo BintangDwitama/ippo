@@ -33,6 +33,9 @@ class SettingsViewModel extends ViewModel {
     notify();
   }
 
+  /// Reads the settings again, for when another screen changed them.
+  Future<void> reload() => _load();
+
   Future<void> setDailyReviewCap(int cap) async {
     if (cap < 1) return;
     await _deps.settingsRepository.setDailyReviewCap(cap);

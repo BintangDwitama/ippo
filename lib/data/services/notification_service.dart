@@ -53,6 +53,22 @@ class NotificationService {
     return false;
   }
 
+  /// Whether notifications are allowed right now. Never prompts.
+  Future<bool> isPermissionGranted() async {
+    await _ensureInitialised();
+    final android = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    if (android != null) {
+      return await android.areNotificationsEnabled() ?? false;
+    }
+    final ios = _plugin.resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>();
+    if (ios != null) {
+      return (await ios.checkPermissions())?.isEnabled ?? false;
+    }
+    return false;
+  }
+
   /// Schedules a notification that repeats every day at [hour]:[minute]
   /// local time, replacing any earlier schedule with the same [id].
   Future<void> scheduleDaily({

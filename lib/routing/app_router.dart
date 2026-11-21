@@ -1,6 +1,8 @@
 import 'package:go_router/go_router.dart';
 import 'package:ippo/app_dependencies.dart';
 import 'package:ippo/routing/routes.dart';
+import 'package:ippo/ui/backup/backup_screen.dart';
+import 'package:ippo/ui/backup/backup_view_model.dart';
 import 'package:ippo/ui/goal/goal_screen.dart';
 import 'package:ippo/ui/goal/goal_view_model.dart';
 import 'package:ippo/ui/home/home_screen.dart';
@@ -80,6 +82,16 @@ GoRouter createAppRouter() {
               SettingsViewModel(context.read<AppDependencies>()),
           child: const SettingsScreen(),
         ),
+        routes: [
+          GoRoute(
+            path: 'backup',
+            builder: (context, state) => ChangeNotifierProvider(
+              create: (context) =>
+                  BackupViewModel(context.read<AppDependencies>()),
+              child: const BackupScreen(),
+            ),
+          ),
+        ],
       ),
     ],
   );

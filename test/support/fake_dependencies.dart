@@ -42,6 +42,8 @@ class FakeDependencies {
   final FakeReminderRepository reminders;
   final FakeMnemonicRepository mnemonics = FakeMnemonicRepository();
   final FakeSettingsRepository settings = FakeSettingsRepository();
+  final FakeBackupRepository backups = FakeBackupRepository();
+  final FakeBackupFileRepository backupFiles = FakeBackupFileRepository();
   final FakeScheduler scheduler = FakeScheduler();
 
   late final AppDependencies app = AppDependencies(
@@ -53,6 +55,8 @@ class FakeDependencies {
     settingsRepository: settings,
     speechRepository: speech,
     reminderRepository: reminders,
+    backupRepository: backups,
+    backupFileRepository: backupFiles,
     unitOfWork: FakeUnitOfWork(),
     scheduler: scheduler,
     clock: () => now,

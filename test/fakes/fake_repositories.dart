@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:ippo/data/repositories/backup_file_repository.dart';
+import 'package:ippo/data/repositories/backup_repository.dart';
 import 'package:ippo/data/repositories/card_repository.dart';
 import 'package:ippo/data/repositories/goal_repository.dart';
 import 'package:ippo/data/repositories/item_repository.dart';
@@ -10,6 +12,7 @@ import 'package:ippo/data/repositories/settings_repository.dart';
 import 'package:ippo/data/repositories/speech_repository.dart';
 import 'package:ippo/data/repositories/unit_of_work.dart';
 import 'package:ippo/domain/models/appearance_mode.dart';
+import 'package:ippo/domain/models/backup_snapshot.dart';
 import 'package:ippo/domain/models/goal.dart';
 import 'package:ippo/domain/models/item.dart';
 import 'package:ippo/domain/models/mnemonic.dart';
@@ -314,6 +317,16 @@ class FakeSettingsRepository implements SettingsRepository {
     appearanceMode = mode;
     _appearanceChanges.add(mode);
   }
+
+  DateTime? lastExportAt;
+
+  @override
+  Future<DateTime?> getLastExportAt() async => lastExportAt;
+
+  @override
+  Future<void> setLastExportAt(DateTime time) async {
+    lastExportAt = time;
+  }
 }
 
 class FakeSpeechRepository implements SpeechRepository {
@@ -347,6 +360,7 @@ class FakeReminderRepository implements ReminderRepository {
 
   @override
   Future<bool> enableReminder(ReminderTime time) async {
+    permissionRequests++;
     if (!permissionGranted) return false;
     scheduled = time;
     return true;
@@ -355,6 +369,80 @@ class FakeReminderRepository implements ReminderRepository {
   @override
   Future<void> disableReminder() async {
     scheduled = null;
+  }
+
+  /// How often permission was asked for.
+  int permissionRequests = 0;
+
+  @override
+  Future<bool> rescheduleIfPermitted(ReminderTime time) async {
+    if (!permissionGranted) return false;
+    scheduled = time;
+    return true;
+  }
+}
+
+/// Holds one snapshot as "the data on the phone".
+class FakeBackupRepository implements BackupRepository {
+  FakeBackupRepository([BackupSnapshot? current])
+      : current = current ?? BackupSnapshot(exportedAt: DateTime.utc(2026));
+
+  BackupSnapshot current;
+
+  /// Every snapshot passed to [replaceWith], in order.
+  final List<BackupSnapshot> replaced = [];
+
+  /// Makes [replaceWith] fail, as a database error would.
+  bool failOnReplace = false;
+
+  @override
+  Future<BackupSnapshot> readSnapshot(DateTime now) async {
+    return BackupSnapshot(
+      exportedAt: now.toUtc(),
+      introducedItems: current.introducedItems,
+      learnerMnemonics: current.learnerMnemonics,
+      cards: current.cards,
+      goals: current.goals,
+      settings: current.settings,
+    );
+  }
+
+  @override
+  Future<void> replaceWith(BackupSnapshot snapshot) async {
+    if (failOnReplace) throw StateError('replace failed');
+    replaced.add(snapshot);
+    current = snapshot;
+  }
+}
+
+/// Stands in for the system's save and open dialogs.
+class FakeBackupFileRepository implements BackupFileRepository {
+  /// Whether the learner picks a location when saving.
+  bool acceptSave = true;
+
+  /// The text of the file the learner picks; null means they cancel.
+  String? fileToPick;
+
+  /// Makes [pickFile] report a file that is too large.
+  bool pickTooLarge = false;
+
+  /// What was saved, by file name.
+  final Map<String, String> saved = {};
+
+  @override
+  Future<bool> saveFile({
+    required String suggestedName,
+    required String text,
+  }) async {
+    if (!acceptSave) return false;
+    saved[suggestedName] = text;
+    return true;
+  }
+
+  @override
+  Future<String?> pickFile() async {
+    if (pickTooLarge) throw const BackupFileTooLargeException();
+    return fileToPick;
   }
 }
 

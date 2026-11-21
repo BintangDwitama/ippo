@@ -21,6 +21,7 @@ List<ContrastPair> textContrastPairs(ThemeData theme) {
     ),
     ContrastPair('accent text on card', scheme.primary, tokens.cardColor),
     ContrastPair('primary button', scheme.onPrimary, scheme.primary),
+    ContrastPair('destructive button', scheme.onError, scheme.error),
     ContrastPair(
       'tonal button',
       scheme.onSecondaryContainer,

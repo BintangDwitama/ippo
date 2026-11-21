@@ -10,6 +10,18 @@ works offline.
 The look is chosen in Settings > Appearance: Automatic (Daylight by day,
 Night in dark mode), Daylight, Night or Paper. All themes share one layout.
 
+## Your data
+
+Progress is stored only on the phone. Settings > Backup and restore saves
+it as one JSON file (`ippo-backup-YYYY-MM-DD.json`) wherever you choose,
+and brings such a file back. An import replaces everything on the phone
+after showing what the file holds. Android's own backup also includes the
+database when backup is turned on in the phone's settings.
+
+When developing: export before installing a build that may need the app
+to be uninstalled first (for example one signed with a different key),
+because an uninstall deletes the data.
+
 ## Getting started
 
 ```
@@ -39,6 +51,7 @@ lib/
   app_dependencies.dart   repositories and use cases, built once
   routing/                go_router routes
   ui/                     screens, one ViewModel and UiState per screen
+  ui/backup/              export and import of the learner's data
   ui/core/theme/          design tokens and the Daylight, Night and Paper themes
   ui/core/widgets/        shared widgets; they read tokens, never a theme name
   domain/                 models, the scheduler, use cases

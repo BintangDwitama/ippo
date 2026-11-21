@@ -2,7 +2,10 @@ import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:async';
+
 import 'package:ippo/app_dependencies.dart';
+import 'package:ippo/data/repositories/drift_backup_repository.dart';
 import 'package:ippo/data/repositories/drift_card_repository.dart';
 import 'package:ippo/data/repositories/drift_goal_repository.dart';
 import 'package:ippo/data/repositories/drift_item_repository.dart';
@@ -10,6 +13,7 @@ import 'package:ippo/data/repositories/drift_mnemonic_repository.dart';
 import 'package:ippo/data/repositories/drift_review_repository.dart';
 import 'package:ippo/data/repositories/drift_settings_repository.dart';
 import 'package:ippo/data/repositories/drift_unit_of_work.dart';
+import 'package:ippo/data/repositories/file_picker_backup_file_repository.dart';
 import 'package:ippo/data/repositories/local_notification_reminder_repository.dart';
 import 'package:ippo/data/repositories/tts_speech_repository.dart';
 import 'package:ippo/data/seed/kana_seed_loader.dart';
@@ -41,6 +45,8 @@ Future<void> main() async {
     speechRepository: TtsSpeechRepository(TtsService()),
     reminderRepository:
         LocalNotificationReminderRepository(NotificationService()),
+    backupRepository: DriftBackupRepository(database, settingsRepository),
+    backupFileRepository: const FilePickerBackupFileRepository(),
     unitOfWork: DriftUnitOfWork(database),
     scheduler: FsrsScheduler(),
   );
@@ -59,6 +65,11 @@ Future<void> main() async {
       initialAppearanceMode: appearanceMode,
     ),
   );
+
+  // The phone may have restored the app's data without the app knowing,
+  // which brings back the reminder setting but not its schedule. A
+  // failure here must not stop the app; the reminder is a convenience.
+  unawaited(dependencies.reconcileReminder().catchError((Object _) {}));
 }
 
 class IppoApp extends StatefulWidget {

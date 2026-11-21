@@ -6,7 +6,8 @@ import 'package:ippo/domain/models/review_card.dart';
 import 'package:ippo/domain/scheduling/scheduler.dart';
 
 /// Records a finished lesson: marks its kana as introduced and creates
-/// their first review cards, all or nothing.
+/// their first review cards, all or nothing. Marks are introduced but get
+/// no cards, because there is nothing to ask about them.
 class CompleteLesson {
   CompleteLesson({
     required this._itemRepository,
@@ -33,6 +34,7 @@ class CompleteLesson {
         now,
       );
       for (final item in items) {
+        if (item.kana.isMark) continue;
         for (final promptType in initialPromptTypes) {
           await _cardRepository.createCard(
             itemId: item.id,

@@ -85,6 +85,15 @@ class KanaGridViewModel extends ViewModel {
     var lastColumn = KanaGridUiState.columns;
     for (final cell in cells) {
       final kana = cell.item.kana;
+      if (kana.isMark) {
+        // Marks have names, not readings, so they simply fill a row.
+        final marks = cells.indexOf(cell);
+        if (marks % KanaGridUiState.columns == 0) {
+          rows.add(List<KanaCell?>.filled(KanaGridUiState.columns, null));
+        }
+        rows.last[marks % KanaGridUiState.columns] = cell;
+        continue;
+      }
       final column = _column(kana.romaji);
       // A kana starts a new table row when its consonant line changes.
       // Where the line is unknown, a vowel that does not advance does.

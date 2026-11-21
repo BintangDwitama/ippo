@@ -118,7 +118,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Basic'), findsOneWidget);
-    expect(find.text('0 known, 71 learning, 33 not started'), findsOneWidget);
+    expect(find.text('1 known, 71 learning, 33 not started'), findsOneWidget);
     await bringIntoView(tester, find.text('Voiced'));
     expect(find.text('が'), findsOneWidget);
     await bringIntoView(tester, find.text('Combination'));
@@ -161,7 +161,7 @@ void main() {
     expect(
       find.descendant(
         of: find.widgetWithText(ListTile, 'Hiragana voiced and combination'),
-        matching: find.text('58 kana'),
+        matching: find.text('59 kana'),
       ),
       findsOneWidget,
     );
@@ -173,7 +173,7 @@ void main() {
 
     final saved = (await deps.goals.getCurrentGoal())!;
     expect(saved.targetSet, GoalTargetSet.hiraganaExtended);
-    expect(find.text('0 of 58 kana introduced'), findsOneWidget);
+    expect(find.text('0 of 59 kana introduced'), findsOneWidget);
   });
 
   for (final mode in [

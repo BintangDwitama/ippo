@@ -16,6 +16,10 @@ enum KanaGroup {
 
   /// A kana followed by a small ya, yu or yo, read as one beat.
   combination,
+
+  /// A sign with no sound of its own that changes the kana next to it:
+  /// the small tsu and the long mark.
+  mark,
 }
 
 /// Kind-specific content of an [Item].
@@ -35,12 +39,14 @@ class KanaPayload extends ItemPayload {
     this.row = '',
     this._family,
     this.lookalikes = const [],
+    this.sample,
   });
 
   final String character;
   final KanaScript script;
 
-  /// The reading taught to the learner, e.g. "shi".
+  /// The reading taught to the learner, e.g. "shi". For a mark, which
+  /// has no reading, its name, e.g. "small tsu".
   final String romaji;
 
   /// Other romanisations accepted in typed answers, e.g. "si".
@@ -57,6 +63,17 @@ class KanaPayload extends ItemPayload {
   /// The reading of the unvoiced basic form. Kana that share a family
   /// are partners: か and が, or は, ば and ぱ.
   String get family => _family ?? romaji;
+
+  /// What to say in place of the character, for kana that are silent on
+  /// their own. A mark's sample is a pair that differs only by the mark.
+  final String? sample;
+
+  /// The text to speak for this kana.
+  String get spoken => sample ?? character;
+
+  /// Whether this kana is a mark. A mark has no reading, so it is never
+  /// asked about and has no review cards.
+  bool get isMark => group == KanaGroup.mark;
 
   /// Characters of the same script that are easily mistaken for this one.
   final List<String> lookalikes;

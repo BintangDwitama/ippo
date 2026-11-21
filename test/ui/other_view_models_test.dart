@@ -124,15 +124,15 @@ void main() {
           await create(FakeDependencies(items: seedKanaItems()));
 
       final state = viewModel.uiState;
-      expect(state.totalCount, 104);
+      expect(state.totalCount, 105);
       expect(state.sections.map((s) => s.group), KanaGroup.values);
       int cells(KanaSection section) => section.rows
           .expand((row) => row)
           .where((cell) => cell != null)
           .length;
-      expect(state.sections.map(cells), [46, 25, 33]);
+      expect(state.sections.map(cells), [46, 25, 33, 1]);
       // Basic: eleven lines, a to n. Voiced: five. Combination: eleven.
-      expect(state.sections.map((s) => s.rows.length), [11, 5, 11]);
+      expect(state.sections.map((s) => s.rows.length), [11, 5, 11, 1]);
       List<String?> row(int section, int index) => [
             for (final cell in state.sections[section].rows[index])
               cell?.item.kana.character,
@@ -144,8 +144,16 @@ void main() {
       expect(row(2, 0), ['きゃ', null, 'きゅ', null, 'きょ']);
 
       viewModel.selectScript(KanaScript.katakana);
-      expect(viewModel.uiState.totalCount, 104);
-      expect(viewModel.uiState.sections.map(cells), [46, 25, 33]);
+      expect(viewModel.uiState.totalCount, 106);
+      expect(viewModel.uiState.sections.map(cells), [46, 25, 33, 2]);
+      // Marks fill their row from the left, in order.
+      expect(
+        [
+          for (final cell in viewModel.uiState.sections.last.rows.single)
+            cell?.item.kana.character,
+        ],
+        ['ッ', 'ー', null, null, null],
+      );
     });
   });
 
@@ -248,9 +256,9 @@ void main() {
         GoalTargetSet.hiragana: 46,
         GoalTargetSet.katakana: 46,
         GoalTargetSet.both: 92,
-        GoalTargetSet.hiraganaExtended: 58,
-        GoalTargetSet.katakanaExtended: 58,
-        GoalTargetSet.everything: 208,
+        GoalTargetSet.hiraganaExtended: 59,
+        GoalTargetSet.katakanaExtended: 60,
+        GoalTargetSet.everything: 211,
       });
     });
 
@@ -261,7 +269,7 @@ void main() {
       viewModel.setTargetSet(GoalTargetSet.everything);
 
       expect(viewModel.uiState.targetSet, GoalTargetSet.everything);
-      expect(viewModel.uiState.targetCounts[GoalTargetSet.everything], 208);
+      expect(viewModel.uiState.targetCounts[GoalTargetSet.everything], 211);
     });
 
     test('suggests each next step of the path after an achieved goal',

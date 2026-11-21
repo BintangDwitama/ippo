@@ -177,9 +177,9 @@ void main() {
         lessons++;
       }
 
-      expect(introducedKeys, hasLength(208));
+      expect(introducedKeys, hasLength(211));
       // Per script: 10 basic lessons, 5 voiced, 6 combination.
-      expect(lessons, 42);
+      expect(lessons, 44);
     });
   });
 
@@ -191,9 +191,9 @@ void main() {
       expect(count(GoalTargetSet.hiragana), 46);
       expect(count(GoalTargetSet.katakana), 46);
       expect(count(GoalTargetSet.both), 92);
-      expect(count(GoalTargetSet.hiraganaExtended), 58);
-      expect(count(GoalTargetSet.katakanaExtended), 58);
-      expect(count(GoalTargetSet.everything), 208);
+      expect(count(GoalTargetSet.hiraganaExtended), 59);
+      expect(count(GoalTargetSet.katakanaExtended), 60);
+      expect(count(GoalTargetSet.everything), 211);
     });
 
     test('basic and extended sets of a script do not overlap', () {
@@ -240,10 +240,10 @@ void main() {
 
       expect(total(GoalTargetSet.hiragana), 46);
       expect(introduced(GoalTargetSet.hiragana), 46);
-      expect(total(GoalTargetSet.hiraganaExtended), 58);
+      expect(total(GoalTargetSet.hiraganaExtended), 59);
       expect(introduced(GoalTargetSet.hiraganaExtended), 0);
       expect(total(GoalTargetSet.both), 92);
-      expect(total(GoalTargetSet.everything), 208);
+      expect(total(GoalTargetSet.everything), 211);
       expect(introduced(GoalTargetSet.everything), 46);
     });
   });

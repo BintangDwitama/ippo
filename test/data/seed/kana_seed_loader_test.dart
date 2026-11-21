@@ -25,18 +25,20 @@ void main() {
     ];
 
     test('has 46 basic, 25 voiced and 33 combination kana per script', () {
-      expect(seeds, hasLength(208));
+      expect(seeds, hasLength(211));
       for (final script in KanaScript.values) {
         expect(of(script, KanaGroup.basic), hasLength(46));
         expect(of(script, KanaGroup.voiced), hasLength(25));
         expect(of(script, KanaGroup.combination), hasLength(33));
       }
+      expect(of(KanaScript.hiragana, KanaGroup.mark), hasLength(1));
+      expect(of(KanaScript.katakana, KanaGroup.mark), hasLength(2));
     });
 
     test('gives every kana a unique key, character and position', () {
-      expect(seeds.map((s) => s.key).toSet(), hasLength(208));
-      expect(seeds.map((s) => s.sortOrder).toSet(), hasLength(208));
-      expect(seeds.map((s) => kana(s).character).toSet(), hasLength(208));
+      expect(seeds.map((s) => s.key).toSet(), hasLength(211));
+      expect(seeds.map((s) => s.sortOrder).toSet(), hasLength(211));
+      expect(seeds.map((s) => kana(s).character).toSet(), hasLength(211));
     });
 
     test('gives every kana a reading, a row and a mnemonic', () {
@@ -87,9 +89,11 @@ void main() {
         (KanaScript.hiragana, KanaGroup.basic),
         (KanaScript.hiragana, KanaGroup.voiced),
         (KanaScript.hiragana, KanaGroup.combination),
+        (KanaScript.hiragana, KanaGroup.mark),
         (KanaScript.katakana, KanaGroup.basic),
         (KanaScript.katakana, KanaGroup.voiced),
         (KanaScript.katakana, KanaGroup.combination),
+        (KanaScript.katakana, KanaGroup.mark),
       ]);
       expect(kana(ordered.first).character, 'あ');
     });
@@ -190,7 +194,9 @@ void main() {
       expect(mnemonic('きゃ'), allOf(contains('き'), contains('や')));
       expect(mnemonic('ぢ'), contains('じ'));
       for (final seed in seeds) {
-        if (kana(seed).group == KanaGroup.basic) continue;
+        if (kana(seed).group == KanaGroup.basic || kana(seed).isMark) {
+          continue;
+        }
         expect(
           seed.defaultMnemonic,
           contains('"${kana(seed).romaji}"'),
@@ -200,7 +206,7 @@ void main() {
     });
   });
 
-  test('seeding twice yields exactly 208 items', () async {
+  test('seeding twice yields exactly 211 items', () async {
     final items = FakeItemRepository();
     final loader = KanaSeedLoader(
       itemRepository: items,
@@ -210,7 +216,101 @@ void main() {
     await loader.seed();
     await loader.seed();
 
-    expect(await items.getItems(), hasLength(208));
+    expect(await items.getItems(), hasLength(211));
+  });
+
+  group('the marks', () {
+    final marks = [
+      for (final seed in realSeed())
+        if ((seed.payload as KanaPayload).isMark) seed,
+    ]..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+    KanaPayload markOf(String character) => marks
+        .map((s) => s.payload as KanaPayload)
+        .firstWhere((k) => k.character == character);
+
+    test('are the small tsu of each script and the long mark', () {
+      expect(marks.map((s) => (s.payload as KanaPayload).character), [
+        'っ',
+        'ッ',
+        'ー',
+      ]);
+      expect(marks.map((s) => s.key), [
+        'hiragana:sokuon',
+        'katakana:sokuon',
+        'katakana:choon',
+      ]);
+      expect(markOf('っ').script, KanaScript.hiragana);
+      expect(markOf('ッ').script, KanaScript.katakana);
+      expect(markOf('ー').script, KanaScript.katakana);
+    });
+
+    test('come after every other kana of their script', () {
+      final seeds = realSeed();
+      for (final mark in marks) {
+        final script = (mark.payload as KanaPayload).script;
+        final others = seeds.where((s) {
+          final kana = s.payload as KanaPayload;
+          return kana.script == script && !kana.isMark;
+        });
+        expect(
+          others.every((s) => s.sortOrder < mark.sortOrder),
+          isTrue,
+          reason: mark.key,
+        );
+      }
+      // And hiragana's mark still comes before any katakana.
+      final firstKatakana = seeds
+          .where(
+            (s) => (s.payload as KanaPayload).script == KanaScript.katakana,
+          )
+          .map((s) => s.sortOrder)
+          .reduce((a, b) => a < b ? a : b);
+      expect(marks.first.sortOrder, lessThan(firstKatakana));
+    });
+
+    test('have a name in place of a reading', () {
+      expect(markOf('っ').romaji, 'small tsu');
+      expect(markOf('ッ').romaji, 'small tsu');
+      expect(markOf('ー').romaji, 'long mark');
+    });
+
+    test('are spoken as a pair that differs only by the mark', () {
+      expect(markOf('っ').spoken, 'きて、きって');
+      expect(markOf('ッ').spoken, 'カト、カット');
+      expect(markOf('ー').spoken, 'ビル、ビール');
+      for (final mark in marks) {
+        final kana = mark.payload as KanaPayload;
+        final pair = kana.spoken.split('、');
+        expect(pair, hasLength(2), reason: mark.key);
+        expect(
+          pair[1].replaceAll(kana.character, ''),
+          pair[0],
+          reason: mark.key,
+        );
+      }
+    });
+
+    test('explain their effect in the mnemonic, with the same example', () {
+      for (final mark in marks) {
+        final kana = mark.payload as KanaPayload;
+        for (final word in kana.spoken.split('、')) {
+          expect(mark.defaultMnemonic, contains(word), reason: mark.key);
+        }
+        expect(mark.defaultMnemonic, contains('no sound of its own'));
+      }
+      expect(marks.first.defaultMnemonic, contains('doubles the consonant'));
+      expect(marks.last.defaultMnemonic, contains('twice as long'));
+    });
+
+    test('ordinary kana are spoken as their character', () {
+      final ka = realSeed()
+          .map((s) => s.payload as KanaPayload)
+          .firstWhere((k) => k.character == 'か');
+
+      expect(ka.sample, isNull);
+      expect(ka.spoken, 'か');
+      expect(ka.isMark, isFalse);
+    });
   });
 
   group('parse', () {

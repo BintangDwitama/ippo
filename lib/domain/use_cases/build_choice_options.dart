@@ -30,7 +30,9 @@ class BuildChoiceOptions {
           item.kind == ItemKind.kana &&
           item.id != correct.id &&
           item.kana.script == answer.script &&
-          item.kana.romaji != answer.romaji,
+          item.kana.romaji != answer.romaji &&
+          // A mark has no reading, so it cannot be an answer.
+          !item.kana.isMark,
     );
 
     final tiers = List.generate(_tierCount, (_) => <Item>[]);

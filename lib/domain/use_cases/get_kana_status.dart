@@ -13,6 +13,8 @@ class GetKanaStatus {
   /// [cards] are the cards belonging to [item].
   KanaStatus call(Item item, Iterable<ReviewCard> cards) {
     if (!item.isIntroduced) return KanaStatus.notStarted;
+    // A mark has no cards to mature; its lesson is all there is to it.
+    if (item.kana.isMark) return KanaStatus.known;
     if (cards.isEmpty) return KanaStatus.learning;
     final allKnown = cards.every(
       (card) =>

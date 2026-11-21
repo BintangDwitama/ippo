@@ -48,10 +48,26 @@ class LessonViewModel extends ViewModel {
     if (_uiState is! LessonPresenting) return;
     if (_presentingIndex + 1 < _lesson.length) {
       _present(_presentingIndex + 1);
+    } else if (_quizzable.isEmpty) {
+      unawaited(_complete());
     } else {
-      _quizQueue = [..._lesson]..shuffle(_deps.random);
+      _quizQueue = [..._quizzable]..shuffle(_deps.random);
       _askNext();
     }
+  }
+
+  /// The kana of the lesson that can be asked about. Marks cannot: they
+  /// have no reading.
+  List<Item> get _quizzable => [
+    for (final item in _lesson)
+      if (!item.kana.isMark) item,
+  ];
+
+  Future<void> _complete() async {
+    await _deps.completeLesson(items: _lesson, now: _deps.clock());
+    _setState(
+      LessonComplete(items: _lesson, hasReviewCards: _quizzable.isNotEmpty),
+    );
   }
 
   void replaySound() {
@@ -83,8 +99,7 @@ class LessonViewModel extends ViewModel {
       _askNext();
       return;
     }
-    await _deps.completeLesson(items: _lesson, now: _deps.clock());
-    _setState(LessonComplete(items: _lesson));
+    await _complete();
   }
 
   /// After a wrong answer: the kana goes to the back of the quiz.
@@ -103,6 +118,7 @@ class LessonViewModel extends ViewModel {
         mnemonic: _mnemonics[item.id]!,
         index: index,
         total: _lesson.length,
+        hasQuiz: _quizzable.isNotEmpty,
       ),
     );
     _speak(item);
@@ -119,14 +135,14 @@ class LessonViewModel extends ViewModel {
           random: _deps.random,
           preferred: _lesson,
         ),
-        answered: _lesson.length - _quizQueue.length,
-        total: _lesson.length,
+        answered: _quizzable.length - _quizQueue.length,
+        total: _quizzable.length,
       ),
     );
   }
 
   void _speak(Item item) {
-    unawaited(_deps.speechRepository.speak(item.kana.character));
+    unawaited(_deps.speechRepository.speak(item.kana.spoken));
   }
 
   void _setState(LessonUiState state) {

@@ -61,6 +61,7 @@ class KanaGridScreen extends StatelessWidget {
                           KanaGroup.basic => 'Basic',
                           KanaGroup.voiced => 'Voiced',
                           KanaGroup.combination => 'Combination',
+                          KanaGroup.mark => 'Marks',
                         },
                         style: Theme.of(context).textTheme.titleMedium,
                       ),

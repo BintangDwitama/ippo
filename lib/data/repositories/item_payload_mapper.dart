@@ -17,6 +17,7 @@ class ItemPayloadMapper {
           'row': payload.row,
           'family': payload.family,
           'lookalikes': payload.lookalikes,
+          if (payload.sample != null) 'sample': payload.sample,
         }),
     };
   }
@@ -43,6 +44,7 @@ class ItemPayloadMapper {
     final row = map['row'] ?? '';
     final family = map['family'];
     final lookalikes = map['lookalikes'] ?? const <Object?>[];
+    final sample = map['sample'];
     if (character is! String ||
         script is! String ||
         romaji is! String ||
@@ -50,7 +52,8 @@ class ItemPayloadMapper {
         group is! String ||
         row is! String ||
         family is! String? ||
-        lookalikes is! List<Object?>) {
+        lookalikes is! List<Object?> ||
+        sample is! String?) {
       throw const FormatException('Invalid kana payload');
     }
     return KanaPayload(
@@ -62,6 +65,7 @@ class ItemPayloadMapper {
       row: row,
       family: family,
       lookalikes: lookalikes.cast<String>().toList(growable: false),
+      sample: sample,
     );
   }
 }

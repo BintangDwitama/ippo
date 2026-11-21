@@ -173,7 +173,7 @@ class ReviewViewModel extends ViewModel {
   }
 
   void _speak(Item item) {
-    unawaited(_deps.speechRepository.speak(item.kana.character));
+    unawaited(_deps.speechRepository.speak(item.kana.spoken));
   }
 
   void _setState(ReviewUiState state) {

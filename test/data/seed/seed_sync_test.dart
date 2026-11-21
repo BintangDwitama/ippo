@@ -149,7 +149,7 @@ void main() {
 
     expect(await learnerData(), before);
     final after = await items.getItems();
-    expect(after, hasLength(208));
+    expect(after, hasLength(211));
     expect(after.where((i) => i.isIntroduced), hasLength(10));
     expect(await cards.getCards(), hasLength(20));
     expect(await reviews.getReviews(), hasLength(20));
@@ -216,7 +216,7 @@ void main() {
     await pumpEventQueue();
 
     expect(writes, isEmpty);
-    expect(await items.getItems(), hasLength(208));
+    expect(await items.getItems(), hasLength(211));
   });
 
   test(
@@ -254,11 +254,11 @@ void main() {
     },
   );
 
-  test('a fresh install gets all 208 kana', () async {
+  test('a fresh install gets all 211 kana', () async {
     await items.syncSeedItems(realSeed());
 
     final all = await items.getItems();
-    expect(all, hasLength(208));
+    expect(all, hasLength(211));
     expect(all.where((i) => i.isIntroduced), isEmpty);
     expect(charactersOf(all).take(5).toList(), ['あ', 'い', 'う', 'え', 'お']);
   });

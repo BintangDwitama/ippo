@@ -17,40 +17,41 @@ class LessonScreen extends StatelessWidget {
     return Scaffold(
       appBar: switch (state) {
         LessonPresenting() => sessionAppBar(
-            context,
-            title: 'Lesson',
-            progress: state.index / state.total,
-          ),
+          context,
+          title: 'Lesson',
+          progress: state.index / state.total,
+        ),
         LessonQuiz() => sessionAppBar(
-            context,
-            title: 'Lesson quiz',
-            progress: state.answered / state.total,
-            count: '${state.answered} / ${state.total}',
-          ),
+          context,
+          title: 'Lesson quiz',
+          progress: state.answered / state.total,
+          count: '${state.answered} / ${state.total}',
+        ),
         _ => sessionAppBar(context, title: 'Lesson'),
       },
       body: SafeArea(
         child: switch (state) {
           LessonLoading() => const Center(child: CircularProgressIndicator()),
           LessonUnavailable() => MessageView(
-              icon: Icons.event_available,
-              title: 'No new kana for today',
-              detail: 'Review what you know and come back tomorrow.',
-              actionLabel: 'Back',
-              onAction: () => context.pop(),
-            ),
+            icon: Icons.event_available,
+            title: 'No new kana for today',
+            detail: 'Review what you know and come back tomorrow.',
+            actionLabel: 'Back',
+            onAction: () => context.pop(),
+          ),
           LessonPresenting() => _Presenting(state: state, viewModel: viewModel),
           LessonQuiz() => _Quiz(state: state, viewModel: viewModel),
           LessonFeedback() => _Feedback(state: state, viewModel: viewModel),
           LessonComplete() => MessageView(
-              icon: Icons.celebration_outlined,
-              title: 'Lesson complete',
-              detail: 'You learned '
-                  '${state.items.map((i) => i.kana.character).join(' ')}. '
-                  'They are now in your reviews.',
-              actionLabel: 'Done',
-              onAction: () => context.pop(),
-            ),
+            icon: Icons.celebration_outlined,
+            title: 'Lesson complete',
+            detail:
+                'You learned '
+                '${state.items.map((i) => i.kana.character).join(' ')}.'
+                '${state.hasReviewCards ? ' They are now in your reviews.' : ''}',
+            actionLabel: 'Done',
+            onAction: () => context.pop(),
+          ),
         },
       ),
     );
@@ -96,7 +97,13 @@ class _Presenting extends StatelessWidget {
           ),
           FilledButton(
             onPressed: viewModel.showNext,
-            child: Text(state.isLast ? 'Start the quiz' : 'Next'),
+            child: Text(
+              !state.isLast
+                  ? 'Next'
+                  : state.hasQuiz
+                  ? 'Start the quiz'
+                  : 'Finish',
+            ),
           ),
         ],
       ),
@@ -170,7 +177,8 @@ class _Feedback extends StatelessWidget {
                   FeedbackBanner(
                     isCorrect: false,
                     label: 'Not quite',
-                    detail: 'You chose "${state.chosen.kana.romaji}". '
+                    detail:
+                        'You chose "${state.chosen.kana.romaji}". '
                         'The answer is "${state.item.kana.romaji}".',
                   ),
                   Gaps.medium,

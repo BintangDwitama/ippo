@@ -23,6 +23,7 @@ class LessonPresenting extends LessonUiState {
     required this.mnemonic,
     required this.index,
     required this.total,
+    this.hasQuiz = true,
   });
 
   final Item item;
@@ -31,6 +32,9 @@ class LessonPresenting extends LessonUiState {
   /// Position of this kana in the lesson, from 0.
   final int index;
   final int total;
+
+  /// Whether a quiz follows the last kana. A lesson of marks has none.
+  final bool hasQuiz;
 
   bool get isLast => index == total - 1;
 }
@@ -66,7 +70,11 @@ class LessonFeedback extends LessonUiState {
 }
 
 class LessonComplete extends LessonUiState {
-  const LessonComplete({required this.items});
+  const LessonComplete({required this.items, this.hasReviewCards = true});
 
   final List<Item> items;
+
+  /// Whether the lesson put anything into the learner's reviews. A lesson
+  /// of marks does not.
+  final bool hasReviewCards;
 }

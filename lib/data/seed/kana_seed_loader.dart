@@ -46,6 +46,8 @@ class KanaSeedLoader {
     final row = entry['row'];
     final family = entry['family'];
     final lookalikes = entry['lookalikes'];
+    // Only marks have one: what to say in place of the character.
+    final sample = entry['sample'];
     // Stated only where two kana of a script share a reading.
     final key = entry['key'];
     if (script is! String ||
@@ -58,6 +60,7 @@ class KanaSeedLoader {
         row is! String ||
         family is! String ||
         lookalikes is! List<Object?> ||
+        sample is! String? ||
         key is! String?) {
       throw FormatException('Invalid kana seed entry: $entry');
     }
@@ -82,6 +85,7 @@ class KanaSeedLoader {
         row: row,
         family: family,
         lookalikes: lookalikes.cast<String>().toList(growable: false),
+        sample: sample,
       ),
       defaultMnemonic: mnemonic,
     );

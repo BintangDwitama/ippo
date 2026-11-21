@@ -40,7 +40,7 @@ class KanaDetailViewModel extends ViewModel {
   void playSound() {
     final item = _item;
     if (item != null) {
-      unawaited(_deps.speechRepository.speak(item.kana.character));
+      unawaited(_deps.speechRepository.speak(item.kana.spoken));
     }
   }
 

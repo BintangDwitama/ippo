@@ -15,10 +15,14 @@ the speaking speed (Normal, Slow or Very slow) and plays a sample.
 
 ## What it teaches
 
-208 kana: for each script, the 46 basic kana, 25 voiced (が, ぱ) and 33
-combination kana (きゃ). The path finishes one script before the next:
-hiragana basics, voiced, combination, then the same for katakana. Lessons
+211 kana: for each script, the 46 basic kana, 25 voiced (が, ぱ) and 33
+combination kana (きゃ), plus three marks: the small っ and ッ, and the long
+mark ー. The path finishes one script before the next: hiragana basics,
+voiced, combination and its mark, then the same for katakana. Lessons
 introduce whole rows, up to six kana. Goals cover one stage of the path.
+
+A mark has no sound of its own, so it is taught as a rule with a spoken
+pair (きて, then きって) and has no review cards.
 
 The seed file is the source of app-owned content. On every launch the app
 adds missing kana and updates the reading, order and default mnemonic of
@@ -73,7 +77,7 @@ lib/
   ui/core/widgets/        shared widgets; they read tokens, never a theme name
   domain/                 models, the scheduler, use cases
   data/                   repositories, services, seed loader
-assets/seed/kana.json     the 208 kana with readings, groups, rows and mnemonics
+assets/seed/kana.json     the 211 kana with readings, groups, rows and mnemonics
 assets/fonts/             bundled fonts (SIL Open Font License) and their licences
 openspec/                 specs, design and tasks for each change
 ```

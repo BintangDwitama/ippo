@@ -85,6 +85,10 @@ Unchanged format and version. A backup recording a mark as introduced names a ke
 - **Path length:** walking every lesson with no goal now takes 44 lessons (42 before): one more for っ and one for ッ with ー.
 - **No change was needed in `GetNextLesson` or `GoalTargetSet`.** The existing rules (cut a lesson at a change of group; everything not basic is extended) already place and count the marks.
 
+### 9. Result on the phone, 22 Nov 2026
+
+The release build was installed over the app. The owner played the sounds and reported that the audio sounds correct (task 7.2). The owner did not say anything about task 7.1, whether progress looked intact after the update, so it is left unticked.
+
 ## Risks / Trade-offs
 
 - **A rule read once is easily forgotten, and nothing reviews it** → Words in the next stage use the marks constantly; a hearing drill is noted as a follow-up.

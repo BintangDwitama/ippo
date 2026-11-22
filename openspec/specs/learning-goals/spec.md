@@ -4,9 +4,9 @@
 TBD - created by archiving change add-kana-trainer. Update Purpose after archive.
 ## Requirements
 ### Requirement: One active SMART goal
-The system SHALL let the learner set one active goal consisting of a target set of kana, a target accuracy, and a deadline in days. The target set SHALL be one of: basic hiragana (46), basic katakana (46), both basic sets (92), voiced and combination hiragana (58), voiced and combination katakana (58), or all kana (208). Each choice SHALL show how many kana it covers. On first launch the system SHALL offer the preset "all 46 hiragana at 90% accuracy within 14 days", which the learner can accept or adjust.
+The system SHALL let the learner set one active goal consisting of a target set of kana, a target accuracy, and a deadline in days. The target set SHALL be one of: basic hiragana (46), basic katakana (46), both basic sets (92), voiced and combination hiragana with the hiragana mark (59), voiced and combination katakana with the katakana marks (60), or all kana (211). Each choice SHALL show how many kana it covers. On first launch the system SHALL offer the preset "all 46 hiragana at 90% accuracy within 14 days", which the learner can accept or adjust.
 
-A goal set before voiced and combination kana existed SHALL keep covering exactly the kana it covered then.
+A goal for basic kana set before voiced and combination kana existed SHALL keep covering exactly the kana it covered then.
 
 #### Scenario: Accept the preset
 - **WHEN** the learner accepts the preset on first launch
@@ -21,12 +21,12 @@ A goal set before voiced and combination kana existed SHALL keep covering exactl
 - **THEN** the goal is not saved and the reason is shown
 
 #### Scenario: Existing goal after an update
-- **WHEN** a learner with an active hiragana goal showing 10 of 46 introduced updates to a version with voiced and combination kana
+- **WHEN** a learner with an active hiragana goal showing 10 of 46 introduced updates to a version with voiced and combination kana and marks
 - **THEN** the goal still shows 10 of 46 and its daily quota is unchanged
 
 #### Scenario: Goal for voiced and combination kana
 - **WHEN** the learner starts a goal for voiced and combination hiragana
-- **THEN** the goal covers 58 kana and lessons offer only those kana
+- **THEN** the goal covers 59 kana, including っ, and lessons offer only those kana
 
 ### Requirement: Daily quota of new kana
 The system SHALL derive a daily quota of new kana from the active goal: the kana in the goal not yet introduced, divided by the days remaining, rounded up, and never less than one while any remain. The quota SHALL be recalculated each day.

@@ -1,0 +1,95 @@
+name: Update word list
+
+# Rebuilds data/words from the newest JMdict once a month and proposes the
+# result as a pull request. Nothing is merged automatically: the pull
+# request shows exactly which words and meanings changed.
+#
+# JMdict's licence asks projects that use it to keep their copy up to date.
+
+on:
+  schedule:
+    - cron: '0 3 5 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-words
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.44.4
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Download the newest English JMdict
+        run: |
+          mkdir -p "$RUNNER_TEMP/jmdict"
+          gh release download --repo scriptin/jmdict-simplified \
+            --pattern 'jmdict-eng-[0-9]*.json.zip' \
+            --dir "$RUNNER_TEMP/jmdict"
+          unzip -q "$RUNNER_TEMP"/jmdict/*.zip -d "$RUNNER_TEMP/jmdict"
+          ls -l "$RUNNER_TEMP/jmdict"
+
+      - name: Build the word list
+        run: |
+          dart run tool/words/build_words.dart \
+            --dictionary "$(ls "$RUNNER_TEMP"/jmdict/jmdict-eng-*.json)" \
+            | tee "$RUNNER_TEMP/build.txt"
+
+      - name: Test the word list
+        run: flutter test test/words
+
+      - name: Propose the change
+        run: |
+          # A newer dictionary that changes no word only changes the date
+          # lines; that is not worth a pull request.
+          if git diff --quiet -I'"dictionaryDate"' -I'^Generated from JMdict dated' -- data/words; then
+            echo "The word list is up to date."
+            exit 0
+          fi
+
+          date="$(sed -n 's/.*"dictionaryDate": "\(.*\)".*/\1/p' data/words/words.json)"
+          branch="words/jmdict-$date"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add data/words
+          git commit -m "Update the word list to JMdict of $date"
+          git push --force origin "$branch"
+
+          if [ -n "$(gh pr list --head "$branch" --json number --jq '.[].number')" ]; then
+            echo "A pull request for $branch is already open; it was updated."
+            exit 0
+          fi
+
+          {
+            echo "Rebuilt from JMdict dated $date."
+            echo
+            echo "Read the diff of \`data/words/preview.md\` to see which words and meanings changed, then merge or close."
+            echo
+            echo '```'
+            sed -n '/^Dictionary dated/,$p' "$RUNNER_TEMP/build.txt"
+            echo '```'
+          } > "$RUNNER_TEMP/body.md"
+
+          if ! gh pr create --base "${{ github.event.repository.default_branch }}" \
+            --head "$branch" \
+            --title "Update the word list to JMdict of $date" \
+            --body-file "$RUNNER_TEMP/body.md"; then
+            echo "::warning::The branch $branch was pushed, but the pull request could not be opened. Allow GitHub Actions to create pull requests in the repository settings (Actions > General > Workflow permissions), or open it by hand."
+          fi

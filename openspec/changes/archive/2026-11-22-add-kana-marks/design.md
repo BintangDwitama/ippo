@@ -87,7 +87,7 @@ Unchanged format and version. A backup recording a mark as introduced names a ke
 
 ### 9. Result on the phone, 22 Nov 2026
 
-The release build was installed over the app. The owner played the sounds and reported that the audio sounds correct (task 7.2). The owner did not say anything about task 7.1, whether progress looked intact after the update, so it is left unticked.
+The release build was installed over the app. The owner played the sounds and reported that the audio sounds correct (task 7.2). After the change was archived, the owner also confirmed that progress was correct after the update (task 7.1).
 
 ## Risks / Trade-offs
 

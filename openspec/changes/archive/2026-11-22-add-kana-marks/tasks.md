@@ -36,5 +36,5 @@
 
 ## 7. On the phone
 
-- [ ] 7.1 Build a release APK, install it over the app, and the owner confirms progress is intact
+- [x] 7.1 Build a release APK, install it over the app, and the owner confirms progress is intact
 - [x] 7.2 The owner opens っ, ッ and ー from the kana grid, plays each sound, and says whether the difference within each pair can be heard; change the samples if not

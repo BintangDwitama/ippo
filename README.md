@@ -64,6 +64,20 @@ flutter analyze
 flutter test
 ```
 
+## Word data
+
+`data/words/` holds a list of about 1,250 beginner words, ready for the
+next stage of the app. It is not used by the app yet.
+
+The list is built from [JMdict](https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project),
+the property of the Electronic Dictionary Research and Development Group,
+used in conformance with the Group's
+[licence](https://www.edrdg.org/edrdg/licence.html), and from Jonathan
+Waller's JLPT vocabulary lists as matched to JMdict by Stephen Kraus. The
+data is licensed CC BY-SA 4.0. Full credit, what was changed and how to
+rebuild are in [`data/words/README.md`](data/words/README.md). A monthly
+job proposes an updated list when the dictionary changes.
+
 ## Structure
 
 ```
@@ -79,6 +93,8 @@ lib/
   data/                   repositories, services, seed loader
 assets/seed/kana.json     the 211 kana with readings, groups, rows and mnemonics
 assets/fonts/             bundled fonts (SIL Open Font License) and their licences
+data/words/               the beginner word list, built from JMdict (not yet in the app)
+tool/words/               the script that builds it
 openspec/                 specs, design and tasks for each change
 ```
 

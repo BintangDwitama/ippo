@@ -1,0 +1,27 @@
+The files in this folder (data/words and its subfolders) are licensed under
+the Creative Commons Attribution-ShareAlike 4.0 International licence
+(CC BY-SA 4.0).
+
+  https://creativecommons.org/licenses/by-sa/4.0/
+  https://creativecommons.org/licenses/by-sa/4.0/legalcode
+
+They are derived from:
+
+  JMdict, the Japanese-Multilingual Dictionary
+  (c) Electronic Dictionary Research and Development Group (EDRDG)
+  https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project
+  https://www.edrdg.org/edrdg/licence.html
+  Licensed CC BY-SA 4.0. Read from the JSON conversion published by
+  jmdict-simplified, https://github.com/scriptin/jmdict-simplified
+
+  JLPT vocabulary lists, levels N5 and N4
+  Compiled by Jonathan Waller, http://www.tanos.co.uk/jlpt/ (CC BY)
+  Matched to JMdict entries by Stephen Kraus,
+  https://github.com/stephenmk/yomitan-jlpt-vocab (CC BY-SA 4.0)
+
+If you share these files or anything made from them, you must credit the
+sources above, say what you changed, and share your version under the
+same licence. See README.md in this folder.
+
+This notice covers the data in this folder only, not the rest of the
+repository.

@@ -32,7 +32,7 @@
 - [x] 4.1 Run the build; commit `data/words/words.json`, `preview.md` and `overrides.json`
 - [x] 4.2 Record in design.md the number of words kept, set aside and unmatched, and how many are readable after each of the first ten rows of kana
 - [x] 4.3 Read every word the preview flags and add overrides for meanings that are wrong, misleading or awkward
-- [ ] 4.4 The owner reads the preview and reports words or meanings that look wrong; add overrides and rebuild
+- [x] 4.4 The owner reads the preview and reports words or meanings that look wrong; add overrides and rebuild
 
 ## 5. Notices
 

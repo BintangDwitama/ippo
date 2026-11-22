@@ -6,7 +6,7 @@ The app teaches kana and nothing a learner can do with them. The next stage is r
 
 - Add a **script** in the repository that builds the app's word list from two open sources: the JMdict dictionary (content) and a beginner vocabulary list at the first two exam levels (selection and order).
 - Add the generated **word file**, holding roughly 1,200 to 1,500 words. Each word has a stable id, its reading in kana, its usual written form, one or two short English meanings, a part of speech, a level, a position in the learning order, and the list of kana a learner must know to read it.
-- Apply fixed **selection rules**: only words readable with the 211 kana the app teaches; nothing the dictionary marks as archaic, obscure or vulgar; one word per reading, keeping the most basic.
+- Apply fixed **selection rules**: only words readable with the 211 kana the app teaches; nothing the dictionary marks as archaic, obscure or vulgar; words that share a reading are kept as separate words.
 - Add an **override file** for correcting a meaning or written form, or leaving a word out, without editing generated data.
 - Add a generated **preview** showing which words become readable after each row of kana, for the owner to review.
 - Add **attribution and licence** notices for both sources, and state the date of the dictionary data. The word file is published under the dictionary's licence.

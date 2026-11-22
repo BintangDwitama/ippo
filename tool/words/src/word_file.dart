@@ -36,12 +36,15 @@ class WordFile {
     );
     final taught = {for (final k in splitter.all) k.key};
     final ids = <String>{};
-    final readings = <String>{};
+    final forms = <String>{};
     for (var i = 0; i < words.length; i++) {
       final word = words[i];
       final name = '${word.id} (${word.reading})';
       require(ids.add(word.id), 'id ${word.id} appears twice');
-      require(readings.add(word.reading), 'reading ${word.reading} twice');
+      require(
+        forms.add(word.form),
+        '${word.reading} (${word.written ?? 'kana'}) appears twice',
+      );
       require(word.order == i + 1, '$name has order ${word.order}');
       require(word.level == 5 || word.level == 4, '$name has a bad level');
       require(

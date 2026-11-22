@@ -8,7 +8,7 @@ Facts established before this design:
 - **jmdict-simplified** republishes JMdict weekly as JSON under the same licence. Each word has an id, kanji forms and kana forms (each with a `common` flag and tags; kana forms say which kanji forms they apply to), and senses with parts of speech, miscellaneous tags and glosses. It has no beginner-level information.
 - **The beginner list** (the reconstructed vocabulary of the first two exam levels, compiled by Jonathan Waller) is described by several projects that republish it as released under Creative Commons Attribution. The author's site no longer resolves, so the original statement could not be read. One project maps the list to JMdict entry ids.
 
-Decisions from exploration: dictionary as the source from the start; the beginner list supplies selection and order; one word per reading; the monthly rebuild is part of this change; nothing ships in the app yet.
+Decisions from exploration: dictionary as the source from the start; the beginner list supplies selection and order; one word per reading (reversed by the owner after seeing the result, see decision 6); the monthly rebuild is part of this change; nothing ships in the app yet.
 
 ## Goals / Non-Goals
 
@@ -24,7 +24,6 @@ Decisions from exploration: dictionary as the source from the start; the beginne
 - Kanji as things to learn. A word records its written form for display only.
 - Example sentences, pitch accent, verb conjugations.
 - Meanings in languages other than English.
-- More than one word per reading.
 
 ## Decisions
 
@@ -97,11 +96,13 @@ The split uses the seed file, so a kana added to the app later makes more words 
 2. It has at least one sense, applying to its reading and spelling, that is not tagged archaic, obsolete, rare, vulgar or derogatory (`arch`, `obs`, `rare`, `vulg`, `derog`, `X`). Senses so tagged are never a source of meanings.
 3. Its reading splits into the app's kana (decision 5).
 4. Overrides are applied: an override may exclude the word, replace its meanings or written form, or name the dictionary entry to build it from.
-5. Among words with the same reading, one is kept: the lower exam level first, then the entry marked common, then the smaller id. The others are listed in the preview as set aside.
+5. Words that share a reading are kept as separate words: 雨 and 飴 are both あめ and both in the list. Only words alike in reading *and* written form are reduced to one (the lower exam level, then the entry marked common, then the smaller id), because a card could not tell them apart; the other is listed in the preview as set aside. None occur in the current data.
+
+The proposal kept one word per reading. Built that way the rule set aside 38 words, among them 雨 rain, 着る to wear, 鼻 nose, 箸 chopsticks, 風邪 a cold and 髪 hair, and with no frequency rank in the dictionary the choice between two words of one level was arbitrary. The owner chose to keep them all. The consequence for the word screens: a card for a word that shares its reading must show the written form, since that is what tells the learner which word is meant. 37 readings are shared, by 75 words.
 
 ### 7. Order
 
-`order` numbers the kept words from 1 by: level (5 before 4); then the latest teaching position among the kana the word needs, so words readable earlier come earlier; then the number of kana in the reading; then the reading itself. Every term is derived from the inputs, so the order is stable.
+`order` numbers the kept words from 1 by: level (5 before 4); then the latest teaching position among the kana the word needs, so words readable earlier come earlier; then the number of kana in the reading; then the reading itself; then, for words that share a reading, the common one and the smaller id. Every term is derived from the inputs, so the order is stable.
 
 The app will not teach in this order blindly: a word is offered only once its kana are learned. The order decides which unlocked word comes first.
 
@@ -109,17 +110,15 @@ The app will not teach in this order blindly: a word is offered only once its ka
 
 `data/words/overrides.json` maps the id of a list row to any of `exclude` (true), `meanings`, `written`, `useEntry` and a free-text `note`. Any other field is refused. The script fails if an override names an id that is not a candidate, so a stale override is noticed.
 
-Because the dictionary carries no frequency rank, the same-reading tie-break is arbitrary between two words of one level. Where it kept the clearly less common word, an `exclude` on that word hands the reading to the other (seven cases, for example 飴 excluded so that 雨 is kept).
-
 ### 9. The script checks its own output
 
-Before writing, the script verifies: ids unique; readings unique; every kana key exists in the seed; meanings non-empty and without parentheses; `order` runs from 1 without gaps; levels are 5 or 4; the word count lies within a sanity range. A failure stops the run with a message and writes nothing. The same checks run as tests against the committed file.
+Before writing, the script verifies: ids unique; no two words alike in reading and written form; every kana key exists in the seed; meanings non-empty and without parentheses; `order` runs from 1 without gaps; levels are 5 or 4; the word count lies within a sanity range. A failure stops the run with a message and writes nothing. The same checks run as tests against the committed file.
 
 Output is written with sorted, stable formatting, one word per line, so a rebuild produces a small, readable diff.
 
 ### 10. Preview
 
-`data/words/preview.md` is generated alongside the word file. For each row of kana in teaching order it lists the words that become readable once that row is learned, with reading, written form and meanings, and the running total. It ends with the words set aside by the same-reading rule and the list entries not matched. It is the document the owner reviews.
+`data/words/preview.md` is generated alongside the word file. For each row of kana in teaching order it lists the words that become readable once that row is learned, with reading, written form and meanings, and the running total. It ends with the entries left out, grouped by reason. It is the document the owner reviews.
 
 ### 11. Attribution
 
@@ -141,7 +140,7 @@ This is the update procedure the dictionary's licence asks for. Its effect reach
 
 ### 13. Testing
 
-- **Logic**, with a small hand-made dictionary and list as fixtures: splitting readings (plain, combination, small っ, long mark, an unreadable character); each selection rule; the same-reading rule and its tie-breaks; meanings (two glosses, parentheses removed); part-of-speech mapping; overrides including a stale one; order.
+- **Logic**, with a small hand-made dictionary and list as fixtures: splitting readings (plain, combination, small っ, long mark, an unreadable character); each selection rule; words that share a reading; meanings (two glosses, parentheses removed); part-of-speech mapping; overrides including a stale one; order.
 - **The committed file**: the checks of decision 9, plus that every word's `kana` matches a fresh split of its reading.
 - **The preview**: every kept word appears exactly once.
 
@@ -156,11 +155,11 @@ This is the update procedure the dictionary's licence asks for. Its effect reach
 
 **Result (task 4.2)**, from the dictionary of 2026-11-16:
 
-- 1,253 words kept. Left out: 5 need a kana the app does not teach (パーティー, フィルム, フォーク, チェック, ファックス), 1 is obsolete (看護婦), 7 excluded by a correction and 31 set aside by the same-reading rule. No row was missing from the dictionary.
-- Meanings: 964 endorsed, 168 corrected by hand, 121 from the first sense and flagged in the preview.
-- Readable after each of the first eleven rows of hiragana (あ, か, さ, た, な, は, ま, や, ら, わ, ん): 13, 37, 81, 159, 208, 244, 325, 362, 554, 590, 662.
+- 1,291 words kept. Left out: 5 need a kana the app does not teach (パーティー, フィルム, フォーク, チェック, ファックス) and 1 is obsolete (看護婦). No row was missing from the dictionary.
+- Meanings: 983 endorsed, 181 corrected by hand, 127 from the first sense and flagged in the preview.
+- Readable after each of the first eleven rows of hiragana (あ, か, さ, た, な, は, ま, や, ら, わ, ん): 14, 40, 85, 167, 217, 259, 343, 381, 587, 623, 697.
 
-**Review (task 4.3)**: every one of the 287 words that first fell to the first sense was read against the list's definition; 168 were corrected. The 964 endorsed meanings were not read one by one. At least one was wrong (厚い came out as "kind; deep"), so the owner's read of the preview still matters.
+**Review (task 4.3)**: every one of the 287 words that first fell to the first sense was read against the list's definition, and so was every word that shares a reading; 181 were corrected. The 983 endorsed meanings were not read one by one. At least one was wrong (厚い came out as "kind; deep"), so the owner's read of the preview still matters.
 
 ## Risks / Trade-offs
 
@@ -168,7 +167,7 @@ This is the update procedure the dictionary's licence asks for. Its effect reach
 - **Dictionary ids may not be the stable sequence numbers assumed** → Checked first. The fallback key is level plus reading.
 - **Automatically chosen meanings will sometimes be poor or too narrow** → The owner reviews the preview; overrides fix what is found; more will be found while studying.
 - **Too few words are readable in the first weeks**, with only ten or twenty kana known → The preview shows the count per row before anything ships. If it is thin, a rule can be loosened (for example admitting the next level early).
-- **One word per reading drops common words.** It sets aside 38 words, among them 着る to wear, 鼻 nose, 箸 chopsticks, 風邪 a cold, 髪 hair, 日 day and 熱い hot. This is a larger loss than expected at proposal time → The preview lists them all. Whether to keep homophones as separate words is put to the owner before the word screens are built; the word id is already unique without the rule.
+- **Words that share a reading look identical in kana** → The written form tells them apart; the word screens must show it for these words (decision 6).
 - **A monthly change in the dictionary alters a meaning unexpectedly** → It arrives as a pull request with a diff.
 - **The dictionary's JSON format may change** → The script checks the file's version field and stops with a clear message on one it does not know.
 - **A large download in a scheduled job** → One 12 MB file a month, kept only for the run.

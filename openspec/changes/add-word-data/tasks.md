@@ -13,7 +13,7 @@
 - [x] 2.3 Implement reading the dictionary file, with a check on its version field
 - [x] 2.4 Implement matching beginner list entries to dictionary entries, collecting the unmatched
 - [x] 2.5 Implement the word record: reading, written form, meanings, part of speech, level, kana
-- [x] 2.6 Implement the selection rules, overrides and the one-word-per-reading rule, collecting the words set aside
+- [x] 2.6 Implement the selection rules, overrides and the rule for words that share a reading, collecting the words set aside
 - [x] 2.7 Implement ordering and the output writer with stable formatting
 - [x] 2.8 Implement the self-checks that stop the build before writing
 - [x] 2.9 Implement the preview
@@ -22,7 +22,7 @@
 
 - [x] 3.1 Fixtures: a small dictionary file and beginner list covering every rule
 - [x] 3.2 Tests for splitting readings: plain, combination, small っ, long mark, an untaught character
-- [x] 3.3 Tests for matching, each selection rule, the same-reading rule and its tie-breaks
+- [x] 3.3 Tests for matching, each selection rule, words that share a reading
 - [x] 3.4 Tests for meanings, part of speech, written form and overrides, including a stale override
 - [x] 3.5 Tests for order, for identical output from identical input, and for a failed self-check leaving the existing file unchanged
 - [x] 3.6 Tests on the committed word file and preview

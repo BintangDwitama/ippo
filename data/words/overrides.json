@@ -172,11 +172,17 @@
   "1577980": {"meanings": ["to be", "to exist"], "note": "For people and animals."},
   "1500940": {"meanings": ["clothes"]},
 
-  "1153520": {"exclude": true, "note": "Sets aside 飴, so that 雨 rain is kept; only one word per reading is kept."},
-  "1275320": {"exclude": true, "note": "Sets aside 厚い, so that 暑い hot is kept; only one word per reading is kept."},
-  "1546640": {"exclude": true, "note": "Sets aside 要る, so that 居る to be is kept; only one word per reading is kept."},
-  "1436570": {"exclude": true, "note": "Sets aside 締める, so that 閉める to close is kept; only one word per reading is kept."},
-  "1298790": {"exclude": true, "note": "Sets aside 撮る, so that 取る to take is kept; only one word per reading is kept."},
-  "1370760": {"exclude": true, "note": "Sets aside 吹く, so that 服 clothes is kept; only one word per reading is kept."},
-  "1512070": {"exclude": true, "note": "Sets aside 辺, so that 変 strange is kept; only one word per reading is kept."}
+  "1153520": {"meanings": ["candy", "sweets"]},
+  "1275320": {"meanings": ["thick"]},
+  "1298790": {"meanings": ["to take a photo"]},
+  "1583720": {"meanings": ["a cold"]},
+  "1467720": {"meanings": ["hot to the touch"]},
+  "1419370": {"meanings": ["to play an instrument"]},
+  "1423000": {"meanings": ["to wear", "to put on"]},
+  "1436570": {"meanings": ["to tie", "to fasten"]},
+  "1219680": {"meanings": ["to drop by", "to approach"]},
+  "1229840": {"meanings": ["to cry"]},
+  "1529550": {"meanings": ["to disappear", "to run out"]},
+  "1532910": {"meanings": ["to ring", "to sound"]},
+  "1427900": {"meanings": ["to stick", "to paste"]}
 }

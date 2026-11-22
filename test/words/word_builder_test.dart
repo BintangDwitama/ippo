@@ -119,11 +119,15 @@ void main() {
     });
   });
 
-  group('one word per reading', () {
-    Map<String, Object?> ame(String id, String kanji, String gloss) =>
-        entry(id, kana: ['あめ'], kanji: [kanji], senses: [sense([gloss])]);
+  group('words that share a reading', () {
+    Map<String, Object?> ame(String id, String? kanji, String gloss) => entry(
+          id,
+          kana: ['あめ'],
+          kanji: [?kanji],
+          senses: [sense([gloss])],
+        );
 
-    test('the lower level wins and the other is set aside', () {
+    test('are kept as separate words, told apart by spelling', () {
       final result = build(
         [
           listed('41', 'あめ', kanji: '飴', definition: 'candy', level: 4),
@@ -131,18 +135,16 @@ void main() {
         ],
         [ame('41', '飴', 'candy'), ame('42', '雨', 'rain')],
       );
-      expect(result.words.single.written, '雨');
-      final aside = result.leftOut.single;
-      expect(aside.reason, LeftOutReason.sameReading);
-      expect(aside.entry.kanji, '飴');
-      expect(aside.detail, contains('雨'));
+      expect(result.words.map((w) => w.written), ['雨', '飴']);
+      expect(result.leftOut, isEmpty);
     });
 
-    test('at the same level the common reading wins', () {
+    test('at one level the common word comes first, then the smaller id', () {
       final result = build(
         [
-          listed('41', 'あめ', kanji: '飴'),
+          listed('43', 'あめ', kanji: '天'),
           listed('42', 'あめ', kanji: '雨'),
+          listed('41', 'あめ', kanji: '飴'),
         ],
         [
           entry(
@@ -154,20 +156,25 @@ void main() {
             senses: [sense(['candy'])],
           ),
           ame('42', '雨', 'rain'),
+          ame('43', '天', 'sky'),
         ],
       );
-      expect(result.words.single.written, '雨');
+      expect(result.words.map((w) => w.id), ['42', '43', '41']);
     });
 
-    test('otherwise the smaller id wins', () {
+    test('with the same spelling too, one is kept and the other reported', () {
       final result = build(
         [
-          listed('42', 'あめ', kanji: '雨'),
-          listed('41', 'あめ', kanji: '飴'),
+          listed('41', 'あめ', definition: 'candy', level: 4),
+          listed('42', 'あめ', definition: 'rain'),
         ],
-        [ame('41', '飴', 'candy'), ame('42', '雨', 'rain')],
+        [ame('41', null, 'candy'), ame('42', null, 'rain')],
       );
-      expect(result.words.single.id, '41');
+      expect(result.words.single.id, '42');
+      final aside = result.leftOut.single;
+      expect(aside.reason, LeftOutReason.sameWord);
+      expect(aside.entry.id, '41');
+      expect(aside.detail, contains('rain'));
     });
   });
 

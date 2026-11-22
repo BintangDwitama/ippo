@@ -49,12 +49,16 @@ Each word SHALL record which of the app's kana are needed to read it, using the 
 - **WHEN** a word's reading uses the same kana twice
 - **THEN** that kana is recorded once
 
-### Requirement: One word per reading
-The list SHALL NOT contain two words with the same reading. Where several beginner words share a reading, the list SHALL keep the one from the lower level, and SHALL report the others as set aside.
+### Requirement: Words that share a reading
+Beginner words that share a reading SHALL each be kept as a separate word with its own identifier. No two words in the list SHALL have both the same reading and the same written form; where the sources give two such words, the list SHALL keep the one from the lower level and SHALL report the other as set aside.
 
-#### Scenario: Shared reading
-- **WHEN** two beginner words are both read はし
-- **THEN** the list contains exactly one word read はし
+#### Scenario: Same reading, different spelling
+- **WHEN** 雨 (rain) and 飴 (candy) are both beginner words read あめ
+- **THEN** the list contains both, each with its own written form and meanings
+
+#### Scenario: Same reading and spelling
+- **WHEN** two beginner words have the same reading and the same written form
+- **THEN** the list contains exactly one of them
 - **AND** the other is named in the preview as set aside
 
 ### Requirement: Learning order
@@ -117,8 +121,8 @@ The project SHALL rebuild the word list from the latest published dictionary at 
 - **THEN** nothing is proposed
 
 ### Requirement: Invalid lists are never published
-A build SHALL verify its result before writing it: identifiers and readings are unique, every recorded kana is one the app teaches, every word has a meaning, and the order has no gaps. If a check fails, the build SHALL stop and leave the existing list unchanged.
+A build SHALL verify its result before writing it: identifiers are unique, no two words share both reading and written form, every recorded kana is one the app teaches, every word has a meaning, and the order has no gaps. If a check fails, the build SHALL stop and leave the existing list unchanged.
 
 #### Scenario: A failed check
-- **WHEN** a build would produce two words with the same reading
+- **WHEN** a build would produce two words with the same reading and written form
 - **THEN** the build fails with a message and the existing word list is not modified

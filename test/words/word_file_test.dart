@@ -55,6 +55,22 @@ void main() {
       expectRefused([...words.take(399), words.first]);
     });
 
+    test('two words alike in reading and spelling are refused', () {
+      final words = manyWords().words;
+      final twin = Word(
+        id: '999999',
+        reading: words[0].reading,
+        written: words[0].written,
+        meanings: const ['twin'],
+        partOfSpeech: 'noun',
+        level: words[1].level,
+        kana: words[0].kana,
+        isCommon: true,
+        order: 2,
+      );
+      expectRefused([words[0], twin, ...words.skip(2)]);
+    });
+
     test('a gap in the order is refused', () {
       final words = manyWords().words;
       expectRefused([words[0], ...words.skip(2)]);
@@ -164,11 +180,12 @@ void main() {
     test('every word is unique, readable and has clean meanings', () {
       final taught = {for (final k in splitter.all) k.key};
       final ids = <Object?>{};
-      final readings = <Object?>{};
+      final forms = <Object?>{};
       for (final word in words) {
         final reading = word['reading']! as String;
         expect(ids.add(word['id']), isTrue, reason: reading);
-        expect(readings.add(reading), isTrue, reason: reading);
+        expect(forms.add('$reading/${word['written']}'), isTrue,
+            reason: reading);
         expect([5, 4], contains(word['level']), reason: reading);
 
         final meanings = (word['meanings']! as List<Object?>).cast<String>();
@@ -213,6 +230,12 @@ void main() {
       expect(wordRead('おいしい')['meanings'], contains('delicious'));
       expect(wordRead('コップ')['id'], '1050390');
       expect(wordRead('たべる')['partOfSpeech'], 'verb');
+    });
+
+    test('words that share a reading are both there', () {
+      final rain = words.where((w) => w['reading'] == 'あめ').toList();
+      expect(rain.map((w) => w['written']), unorderedEquals(['雨', '飴']));
+      expect(rain.map((w) => w['meanings']), anyElement(equals(['rain'])));
     });
 
     test('every correction names a row of the beginner list', () {

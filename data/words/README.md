@@ -1,6 +1,6 @@
 # Word data
 
-The beginner word list for Ippo: about 1,250 Japanese words with their
+The beginner word list for Ippo: about 1,300 Japanese words with their
 reading, written form, meanings and the kana needed to read each one.
 
 | File | What it is |
@@ -44,7 +44,8 @@ The list is a selection and rearrangement, not a copy:
   with the kana the app teaches.
 - Words the dictionary marks archaic, obsolete, rare, vulgar or derogatory
   are left out.
-- Where two words share a reading, one is kept.
+- Words that share a reading (雨 rain and 飴 candy are both あめ) are kept
+  as separate words.
 - Each word keeps at most three short meanings. The dictionary's wording
   is used for the meanings the beginner list names; explanations in
   parentheses are dropped.

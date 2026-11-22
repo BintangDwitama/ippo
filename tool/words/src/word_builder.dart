@@ -55,6 +55,10 @@ class Word {
   /// Position in the learning order, from 1; 0 until the list is ordered.
   final int order;
 
+  /// What a learner sees of the word: its reading and its spelling. No
+  /// two words of the list share it.
+  String get form => '$reading/${written ?? ''}';
+
   /// The teaching position of the last kana the learner needs.
   int get unlockOrder => unlockKana.order;
 
@@ -150,7 +154,7 @@ enum LeftOutReason {
   ),
   noMeaning('no usable meaning'),
   excludedByOverride('excluded by a correction'),
-  sameReading('set aside: another word has the same reading');
+  sameWord('set aside: another word has the same reading and spelling');
 
   const LeftOutReason(this.description);
 
@@ -270,26 +274,29 @@ class WordBuilder {
       if (!corrected.contains(id)) throw StaleOverrideException(id);
     }
 
-    // One word per reading: the lower level, then the common one, then
+    // Words that share a reading are kept as separate words: 雨 and 飴
+    // are both あめ, and the spelling tells them apart. Two words that
+    // share reading and spelling could not be told apart on a card, so
+    // of those one is kept: the lower level, then the common one, then
     // the smaller id.
     candidates.sort(_preference);
-    final byReading = <String, Word>{};
+    final byForm = <String, Word>{};
     for (final word in candidates) {
-      final kept = byReading[word.reading];
+      final kept = byForm[word.form];
       if (kept == null) {
-        byReading[word.reading] = word;
+        byForm[word.form] = word;
       } else {
         leftOut.add(
           LeftOut(
             entryOf[word.id]!,
-            LeftOutReason.sameReading,
+            LeftOutReason.sameWord,
             'kept ${kept.written ?? kept.reading} (${kept.meanings.first})',
           ),
         );
       }
     }
 
-    final ordered = byReading.values.toList()..sort(_learningOrder);
+    final ordered = byForm.values.toList()..sort(_learningOrder);
     return BuildResult(
       words: [
         for (var i = 0; i < ordered.length; i++)
@@ -439,7 +446,10 @@ class WordBuilder {
     if (byUnlock != 0) return byUnlock;
     final byLength = a.reading.runes.length.compareTo(b.reading.runes.length);
     if (byLength != 0) return byLength;
-    return a.reading.compareTo(b.reading);
+    final byReading = a.reading.compareTo(b.reading);
+    if (byReading != 0) return byReading;
+    // Words that share a reading: the common one first, then by id.
+    return _preference(a, b);
   }
 }
 

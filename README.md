@@ -66,7 +66,7 @@ flutter test
 
 ## Word data
 
-`data/words/` holds a list of about 1,250 beginner words, ready for the
+`data/words/` holds a list of about 1,300 beginner words, ready for the
 next stage of the app. It is not used by the app yet.
 
 The list is built from [JMdict](https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project),

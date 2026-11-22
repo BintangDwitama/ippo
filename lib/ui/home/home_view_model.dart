@@ -146,6 +146,14 @@ class HomeViewModel extends ViewModel {
             in _deps.getNextLesson(items: items, goal: goal, now: now))
           item.kana.character,
       ],
+      nextLessonWords: [
+        for (final item in _deps.getNextWordLesson(
+          items: items,
+          now: now,
+          currentKeys: _deps.wordListInfo?.keys,
+        ))
+          item.word.reading,
+      ],
       streak: _deps.getStudyStats.streak(
         items: items,
         reviews: reviews,

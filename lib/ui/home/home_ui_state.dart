@@ -10,6 +10,10 @@ enum HomePrimaryAction {
   /// Nothing is due, but new kana can be learned today.
   lesson,
 
+  /// Nothing is due and today's kana are done, but new words can be
+  /// learned.
+  wordLesson,
+
   /// Nothing to do right now.
   rest,
 }
@@ -22,6 +26,7 @@ class HomeUiState {
     this.progress,
     this.dueCount = 0,
     this.nextLessonKana = const [],
+    this.nextLessonWords = const [],
     this.streak = 0,
     this.nextDue,
     this.isReviewCapReached = false,
@@ -40,6 +45,10 @@ class HomeUiState {
   /// The characters the next lesson introduces, in teaching order; empty
   /// when no lesson is available today.
   final List<String> nextLessonKana;
+
+  /// The readings of the words the next word lesson introduces, in
+  /// learning order; empty when no word lesson is available today.
+  final List<String> nextLessonWords;
   final int streak;
 
   /// When the next card becomes due, if nothing is due now.
@@ -56,10 +65,15 @@ class HomeUiState {
   /// Kana in the next lesson; 0 when no lesson is available today.
   int get lessonSize => nextLessonKana.length;
 
-  /// Reviews come first, then a lesson, then rest.
+  /// Words in the next word lesson; 0 when none is available today.
+  int get wordLessonSize => nextLessonWords.length;
+
+  /// Reviews come first, then a kana lesson, then a word lesson, then
+  /// rest. Kana before words, because kana unlock words.
   HomePrimaryAction get primaryAction {
     if (dueCount > 0) return HomePrimaryAction.review;
     if (lessonSize > 0) return HomePrimaryAction.lesson;
+    if (wordLessonSize > 0) return HomePrimaryAction.wordLesson;
     return HomePrimaryAction.rest;
   }
 }

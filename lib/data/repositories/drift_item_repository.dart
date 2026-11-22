@@ -45,22 +45,30 @@ class DriftItemRepository implements ItemRepository {
           row.itemId: row.defaultText,
       };
 
+      // New items without a mnemonic need no id back, so they are
+      // written together: the word list adds over a thousand at once.
+      final plainInserts = <ItemsCompanion>[];
+
       for (final seed in seedItems) {
         final payload = _payloadMapper.encode(seed.payload);
         final row = existing[seed.key];
+        final mnemonic = seed.defaultMnemonic;
         if (row == null) {
-          final id = await _db.into(_db.items).insert(
-                ItemsCompanion.insert(
-                  kind: seed.kind,
-                  itemKey: seed.key,
-                  payload: payload,
-                  sortOrder: seed.sortOrder,
-                ),
-              );
+          final insert = ItemsCompanion.insert(
+            kind: seed.kind,
+            itemKey: seed.key,
+            payload: payload,
+            sortOrder: seed.sortOrder,
+          );
+          if (mnemonic == null) {
+            plainInserts.add(insert);
+            continue;
+          }
+          final id = await _db.into(_db.items).insert(insert);
           await _db.into(_db.mnemonics).insert(
                 MnemonicsCompanion.insert(
                   itemId: Value(id),
-                  defaultText: seed.defaultMnemonic,
+                  defaultText: mnemonic,
                 ),
               );
           continue;
@@ -77,13 +85,17 @@ class DriftItemRepository implements ItemRepository {
             ),
           );
         }
-        if (defaults[row.id] != seed.defaultMnemonic) {
+        if (mnemonic != null && defaults[row.id] != mnemonic) {
           await (_db.update(_db.mnemonics)
                 ..where((t) => t.itemId.equals(row.id)))
               .write(
-            MnemonicsCompanion(defaultText: Value(seed.defaultMnemonic)),
+            MnemonicsCompanion(defaultText: Value(mnemonic)),
           );
         }
+      }
+
+      if (plainInserts.isNotEmpty) {
+        await _db.batch((batch) => batch.insertAll(_db.items, plainInserts));
       }
     });
   }

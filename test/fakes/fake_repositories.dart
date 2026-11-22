@@ -76,7 +76,8 @@ class FakeItemRepository implements ItemRepository {
             payload: seed.payload,
           ),
         );
-        seededMnemonics[id] = seed.defaultMnemonic;
+        final mnemonic = seed.defaultMnemonic;
+        if (mnemonic != null) seededMnemonics[id] = mnemonic;
       } else {
         final item = _items[index];
         _items[index] = Item(
@@ -87,7 +88,8 @@ class FakeItemRepository implements ItemRepository {
           payload: seed.payload,
           introducedAt: item.introducedAt,
         );
-        seededMnemonics[item.id] = seed.defaultMnemonic;
+        final mnemonic = seed.defaultMnemonic;
+        if (mnemonic != null) seededMnemonics[item.id] = mnemonic;
       }
     }
     _observable.notify();

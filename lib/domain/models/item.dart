@@ -1,8 +1,8 @@
 import 'package:meta/meta.dart';
 
-/// The kinds of thing that can be learned. Later stages add vocabulary
-/// and kanji here; cards and scheduling do not change.
-enum ItemKind { kana }
+/// The kinds of thing that can be learned. Later stages add kanji here;
+/// cards and scheduling do not change.
+enum ItemKind { kana, word }
 
 enum KanaScript { hiragana, katakana }
 
@@ -81,7 +81,45 @@ class KanaPayload extends ItemPayload {
   List<String> get acceptedRomaji => [romaji, ...alternativeRomaji];
 }
 
-/// One thing to learn, such as a single kana.
+/// A word of the beginner word list.
+@immutable
+class WordPayload extends ItemPayload {
+  const WordPayload({
+    required this.reading,
+    required this.meanings,
+    required this.partOfSpeech,
+    required this.level,
+    required this.kanaKeys,
+    this.written,
+  });
+
+  /// How the word is read, in kana. This is also what is spoken: a voice
+  /// can misread kanji.
+  final String reading;
+
+  /// How the word is usually written, when that is not its reading.
+  /// Shown for recognition only; it tells apart words that share a
+  /// reading, such as 雨 and 飴, both あめ.
+  final String? written;
+
+  /// One to three short English meanings, the most useful first.
+  final List<String> meanings;
+
+  /// For example "noun" or "verb", as the word list names it.
+  final String partOfSpeech;
+
+  /// The exam level the word is listed at: 5 is the first, 4 the second.
+  final int level;
+
+  /// Keys of the kana needed to read the word. The word can be learned
+  /// once all of them have been introduced.
+  final List<String> kanaKeys;
+
+  /// All meanings as one line of text.
+  String get meaningText => meanings.join('; ');
+}
+
+/// One thing to learn, such as a single kana or a word.
 @immutable
 class Item {
   const Item({
@@ -109,6 +147,12 @@ class Item {
 
   bool get isIntroduced => introducedAt != null;
 
-  /// The kana content. Only valid for items of kind [ItemKind.kana].
+  bool get isKana => kind == ItemKind.kana;
+  bool get isWord => kind == ItemKind.word;
+
+  /// The kana content. Throws for an item of another kind.
   KanaPayload get kana => payload as KanaPayload;
+
+  /// The word content. Throws for an item of another kind.
+  WordPayload get word => payload as WordPayload;
 }

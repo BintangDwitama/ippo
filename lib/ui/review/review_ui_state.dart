@@ -36,7 +36,8 @@ class ReviewQuestion extends ReviewUiState {
   final Item item;
   final PromptType promptType;
 
-  /// The four choices; empty for typed prompts.
+  /// The four choices; empty for typed prompts. For a word card these
+  /// are words, shown as meanings or as words by the prompt type.
   final List<Item> options;
 
   /// Cards attempted so far in this session.
@@ -47,17 +48,27 @@ class ReviewQuestion extends ReviewUiState {
   final bool isRepeat;
 }
 
-/// The learner answered wrongly.
+/// What follows an answer: after a wrong answer to a kana card, and after
+/// every answer to a word card, which shows the word in full either way.
 class ReviewFeedback extends ReviewUiState {
   const ReviewFeedback({
     required this.item,
-    required this.mnemonic,
     required this.promptType,
     required this.givenAnswer,
+    this.mnemonic,
+    this.wasCorrect = false,
+    this.voiceAvailable = true,
   });
 
   final Item item;
-  final Mnemonic mnemonic;
+
+  /// The kana's mnemonic; null for a word, which has none.
+  final Mnemonic? mnemonic;
+
+  final bool wasCorrect;
+
+  /// Whether the phone can speak Japanese.
+  final bool voiceAvailable;
   final PromptType promptType;
 
   /// What the learner answered, as shown to them.

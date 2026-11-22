@@ -73,6 +73,8 @@ flutter:
 
   assets:
     - assets/seed/kana.json
+    # The word list, bundled from where the build script writes it.
+    - data/words/words.json
     - assets/fonts/licenses/
 
   # Bundled so the app looks the same offline. The Latin families are

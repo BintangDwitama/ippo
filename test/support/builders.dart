@@ -89,6 +89,36 @@ List<Item> kanaItems({
   ];
 }
 
+/// A word item. Word ids start high so they never collide with the ids
+/// [kanaItems] gives out.
+Item wordItem({
+  required int id,
+  required String reading,
+  List<String> meanings = const ['meaning'],
+  List<String> kanaKeys = const [],
+  String? written,
+  String partOfSpeech = 'noun',
+  int level = 5,
+  int? sortOrder,
+  DateTime? introducedAt,
+}) {
+  return Item(
+    id: id,
+    kind: ItemKind.word,
+    key: 'word:$id',
+    sortOrder: sortOrder ?? 100000 + id,
+    payload: WordPayload(
+      reading: reading,
+      written: written,
+      meanings: meanings,
+      partOfSpeech: partOfSpeech,
+      level: level,
+      kanaKeys: kanaKeys,
+    ),
+    introducedAt: introducedAt,
+  );
+}
+
 ReviewCard reviewCard({
   required int id,
   required int itemId,

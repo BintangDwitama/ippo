@@ -99,7 +99,7 @@ void main() {
     final feedback = viewModel.uiState as ReviewFeedback;
     expect(feedback.item.kana.character, 'か');
     expect(feedback.givenAnswer, wrong.kana.romaji);
-    expect(feedback.mnemonic.text, isNotEmpty);
+    expect(feedback.mnemonic!.text, isNotEmpty);
     expect(deps.speech.spoken, ['か']);
 
     viewModel.continueAfterFeedback();

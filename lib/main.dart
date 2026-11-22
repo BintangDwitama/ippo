@@ -17,6 +17,7 @@ import 'package:ippo/data/repositories/file_picker_backup_file_repository.dart';
 import 'package:ippo/data/repositories/local_notification_reminder_repository.dart';
 import 'package:ippo/data/repositories/tts_speech_repository.dart';
 import 'package:ippo/data/seed/kana_seed_loader.dart';
+import 'package:ippo/data/seed/word_seed_loader.dart';
 import 'package:ippo/data/services/app_database.dart';
 import 'package:ippo/data/services/notification_service.dart';
 import 'package:ippo/data/services/tts_service.dart';
@@ -35,6 +36,16 @@ Future<void> main() async {
   final database = AppDatabase(driftDatabase(name: 'ippo'));
   final itemRepository = DriftItemRepository(database);
   final settingsRepository = DriftSettingsRepository(database);
+  await KanaSeedLoader(
+    itemRepository: itemRepository,
+    loadSeedJson: () => rootBundle.loadString(KanaSeedLoader.assetPath),
+  ).seed();
+  // After the kana: a word names the kana needed to read it.
+  final wordListInfo = await WordSeedLoader(
+    itemRepository: itemRepository,
+    loadSeedJson: () => rootBundle.loadString(WordSeedLoader.assetPath),
+  ).seed();
+
   final dependencies = AppDependencies(
     itemRepository: itemRepository,
     mnemonicRepository: DriftMnemonicRepository(database),
@@ -49,12 +60,8 @@ Future<void> main() async {
     backupFileRepository: const FilePickerBackupFileRepository(),
     unitOfWork: DriftUnitOfWork(database),
     scheduler: FsrsScheduler(),
+    wordListInfo: wordListInfo,
   );
-
-  await KanaSeedLoader(
-    itemRepository: itemRepository,
-    loadSeedJson: () => rootBundle.loadString(KanaSeedLoader.assetPath),
-  ).seed();
 
   // Read before the first frame so the app never flashes another theme.
   final appearanceMode = await settingsRepository.getAppearanceMode();

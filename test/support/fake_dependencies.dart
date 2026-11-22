@@ -5,6 +5,7 @@ import 'package:ippo/domain/models/goal.dart';
 import 'package:ippo/domain/models/item.dart';
 import 'package:ippo/domain/models/review_card.dart';
 import 'package:ippo/domain/models/review_record.dart';
+import 'package:ippo/domain/models/word_list_info.dart';
 
 import '../fakes/fake_repositories.dart';
 import '../fakes/fake_scheduler.dart';
@@ -20,6 +21,7 @@ class FakeDependencies {
     DateTime? now,
     bool japaneseVoiceAvailable = true,
     bool notificationPermissionGranted = true,
+    this.wordListInfo,
   })  : now = now ?? DateTime(2026, 1, 10, 9),
         items = FakeItemRepository(items),
         cards = FakeCardRepository(cards),
@@ -30,6 +32,8 @@ class FakeDependencies {
         reminders = FakeReminderRepository(
           permissionGranted: notificationPermissionGranted,
         );
+
+  final WordListInfo? wordListInfo;
 
   /// The time the fake clock reports; tests may change it.
   DateTime now;
@@ -61,5 +65,6 @@ class FakeDependencies {
     scheduler: scheduler,
     clock: () => now,
     random: Random(42),
+    wordListInfo: wordListInfo,
   );
 }

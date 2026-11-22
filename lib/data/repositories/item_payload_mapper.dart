@@ -19,6 +19,14 @@ class ItemPayloadMapper {
           'lookalikes': payload.lookalikes,
           if (payload.sample != null) 'sample': payload.sample,
         }),
+      WordPayload() => jsonEncode({
+          'reading': payload.reading,
+          if (payload.written != null) 'written': payload.written,
+          'meanings': payload.meanings,
+          'partOfSpeech': payload.partOfSpeech,
+          'level': payload.level,
+          'kana': payload.kanaKeys,
+        }),
     };
   }
 
@@ -30,7 +38,33 @@ class ItemPayloadMapper {
     }
     return switch (kind) {
       ItemKind.kana => _decodeKana(decoded),
+      ItemKind.word => _decodeWord(decoded),
     };
+  }
+
+  WordPayload _decodeWord(Map<String, Object?> map) {
+    final reading = map['reading'];
+    final written = map['written'];
+    final meanings = map['meanings'];
+    final partOfSpeech = map['partOfSpeech'];
+    final level = map['level'];
+    final kana = map['kana'];
+    if (reading is! String ||
+        written is! String? ||
+        meanings is! List<Object?> ||
+        partOfSpeech is! String ||
+        level is! int ||
+        kana is! List<Object?>) {
+      throw const FormatException('Invalid word payload');
+    }
+    return WordPayload(
+      reading: reading,
+      written: written,
+      meanings: meanings.cast<String>().toList(growable: false),
+      partOfSpeech: partOfSpeech,
+      level: level,
+      kanaKeys: kana.cast<String>().toList(growable: false),
+    );
   }
 
   KanaPayload _decodeKana(Map<String, Object?> map) {

@@ -17,6 +17,8 @@ import 'package:ippo/ui/review/review_screen.dart';
 import 'package:ippo/ui/review/review_view_model.dart';
 import 'package:ippo/ui/settings/settings_screen.dart';
 import 'package:ippo/ui/settings/settings_view_model.dart';
+import 'package:ippo/ui/word_lesson/word_lesson_screen.dart';
+import 'package:ippo/ui/word_lesson/word_lesson_view_model.dart';
 import 'package:provider/provider.dart';
 
 /// Builds the app's routes. Each route creates its screen's ViewModel,
@@ -38,6 +40,14 @@ GoRouter createAppRouter() {
           create: (context) =>
               LessonViewModel(context.read<AppDependencies>()),
           child: const LessonScreen(),
+        ),
+      ),
+      GoRoute(
+        path: Routes.wordLesson,
+        builder: (context, state) => ChangeNotifierProvider(
+          create: (context) =>
+              WordLessonViewModel(context.read<AppDependencies>()),
+          child: const WordLessonScreen(),
         ),
       ),
       GoRoute(

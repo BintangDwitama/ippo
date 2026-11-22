@@ -18,6 +18,7 @@ class ReviewViewModel extends ViewModel {
   Map<int, Item> _itemsById = const {};
   late ReviewSession _session;
   bool _isAnswering = false;
+  bool _voiceAvailable = true;
 
   ReviewUiState _uiState = const ReviewLoading();
   ReviewUiState get uiState => _uiState;
@@ -35,6 +36,7 @@ class ReviewViewModel extends ViewModel {
     );
     final voiceAvailable =
         await _deps.speechRepository.isJapaneseVoiceAvailable();
+    _voiceAvailable = voiceAvailable;
 
     final sessionCards = _deps.buildReviewSession(
       cards: cards,
@@ -71,9 +73,14 @@ class ReviewViewModel extends ViewModel {
   Future<void> answerChoice(Item option) async {
     final state = _uiState;
     if (state is! ReviewQuestion || state.promptType.isTyped) return;
-    final shown = state.promptType == PromptType.soundToCharChoice
-        ? option.kana.character
-        : option.kana.romaji;
+    final shown = switch (state.promptType) {
+      PromptType.soundToCharChoice => option.kana.character,
+      PromptType.wordToMeaningChoice => option.word.meaningText,
+      PromptType.meaningToWordChoice => option.word.reading,
+      PromptType.charToSoundChoice ||
+      PromptType.charToSoundTyped =>
+        option.kana.romaji,
+    };
     await _answer(wasCorrect: option.id == state.item.id, givenAnswer: shown);
   }
 
@@ -91,7 +98,9 @@ class ReviewViewModel extends ViewModel {
   void replaySound() {
     final state = _uiState;
     final item = switch (state) {
-      ReviewQuestion() => state.item,
+      // A word question is never read out: the sound would give away a
+      // word shown as an option.
+      ReviewQuestion() => state.item.isKana ? state.item : null,
       ReviewFeedback() => state.item,
       _ => null,
     };
@@ -123,7 +132,20 @@ class ReviewViewModel extends ViewModel {
       }
       _session.recordAnswer(wasCorrect: wasCorrect);
 
-      if (wasCorrect) {
+      if (item.isWord) {
+        // Right or wrong, the word is shown in full and spoken: seeing
+        // and hearing it again is part of learning it.
+        _setState(
+          ReviewFeedback(
+            item: item,
+            promptType: card.promptType,
+            givenAnswer: givenAnswer,
+            wasCorrect: wasCorrect,
+            voiceAvailable: _voiceAvailable,
+          ),
+        );
+        _speak(item);
+      } else if (wasCorrect) {
         _askCurrent();
       } else {
         _setState(
@@ -159,11 +181,17 @@ class ReviewViewModel extends ViewModel {
         promptType: card.promptType,
         options: card.promptType.isTyped
             ? const []
-            : _deps.buildChoiceOptions(
-                correct: item,
-                allItems: _allItems,
-                random: _deps.random,
-              ),
+            : item.isWord
+                ? _deps.buildWordChoiceOptions(
+                    correct: item,
+                    allItems: _allItems,
+                    random: _deps.random,
+                  )
+                : _deps.buildChoiceOptions(
+                    correct: item,
+                    allItems: _allItems,
+                    random: _deps.random,
+                  ),
         reviewed: _session.reviewedCount,
         total: _session.total,
         isRepeat: _session.isRepeat,
@@ -173,6 +201,12 @@ class ReviewViewModel extends ViewModel {
   }
 
   void _speak(Item item) {
+    if (item.isWord) {
+      if (!_voiceAvailable) return;
+      // The reading, never the written form: a voice can misread kanji.
+      unawaited(_deps.speechRepository.speak(item.word.reading));
+      return;
+    }
     unawaited(_deps.speechRepository.speak(item.kana.spoken));
   }
 

@@ -9,12 +9,14 @@ class SeedItem {
     required this.key,
     required this.sortOrder,
     required this.payload,
-    required this.defaultMnemonic,
+    this.defaultMnemonic,
   });
 
   final ItemKind kind;
   final String key;
   final int sortOrder;
   final ItemPayload payload;
-  final String defaultMnemonic;
+
+  /// Null for kinds that have no mnemonic, such as words.
+  final String? defaultMnemonic;
 }

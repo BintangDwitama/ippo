@@ -45,7 +45,7 @@ void main() {
       for (final seed in seeds) {
         expect(kana(seed).romaji, isNotEmpty, reason: seed.key);
         expect(kana(seed).row, isNotEmpty, reason: seed.key);
-        expect(seed.defaultMnemonic.trim(), isNotEmpty, reason: seed.key);
+        expect(seed.defaultMnemonic!.trim(), isNotEmpty, reason: seed.key);
       }
     });
 
@@ -187,7 +187,7 @@ void main() {
       final hiragana = of(KanaScript.hiragana);
       String mnemonic(String character) => hiragana
           .firstWhere((s) => kana(s).character == character)
-          .defaultMnemonic;
+          .defaultMnemonic!;
 
       expect(mnemonic('が'), allOf(contains('か'), contains('"ga"')));
       expect(mnemonic('ぱ'), allOf(contains('は'), contains('circle')));

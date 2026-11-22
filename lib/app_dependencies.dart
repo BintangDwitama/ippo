@@ -14,13 +14,16 @@ import 'package:ippo/data/repositories/unit_of_work.dart';
 import 'package:ippo/domain/scheduling/scheduler.dart';
 import 'package:ippo/domain/study_calendar.dart';
 import 'package:ippo/domain/use_cases/build_choice_options.dart';
+import 'package:ippo/domain/models/word_list_info.dart';
 import 'package:ippo/domain/use_cases/build_review_session.dart';
+import 'package:ippo/domain/use_cases/build_word_choice_options.dart';
 import 'package:ippo/domain/use_cases/check_typed_answer.dart';
 import 'package:ippo/domain/use_cases/complete_lesson.dart';
 import 'package:ippo/domain/use_cases/export_backup.dart';
 import 'package:ippo/domain/use_cases/get_goal_progress.dart';
 import 'package:ippo/domain/use_cases/get_kana_status.dart';
 import 'package:ippo/domain/use_cases/get_next_lesson.dart';
+import 'package:ippo/domain/use_cases/get_next_word_lesson.dart';
 import 'package:ippo/domain/use_cases/get_study_stats.dart';
 import 'package:ippo/domain/use_cases/grade_answer.dart';
 import 'package:ippo/domain/use_cases/read_backup.dart';
@@ -48,6 +51,7 @@ class AppDependencies {
     required Scheduler scheduler,
     Clock? clock,
     Random? random,
+    this.wordListInfo,
   })  : clock = clock ?? DateTime.now,
         random = random ?? Random(),
         completeLesson = CompleteLesson(
@@ -91,6 +95,10 @@ class AppDependencies {
   final BackupRepository backupRepository;
   final BackupFileRepository backupFileRepository;
 
+  /// The bundled word list; null when no list was loaded, as in tests
+  /// that do not need one.
+  final WordListInfo? wordListInfo;
+
   final Clock clock;
   final Random random;
 
@@ -103,7 +111,10 @@ class AppDependencies {
   final RestoreBackup restoreBackup;
 
   final GetNextLesson getNextLesson = const GetNextLesson();
+  final GetNextWordLesson getNextWordLesson = const GetNextWordLesson();
   final BuildChoiceOptions buildChoiceOptions = const BuildChoiceOptions();
+  final BuildWordChoiceOptions buildWordChoiceOptions =
+      const BuildWordChoiceOptions();
   final BuildReviewSession buildReviewSession = const BuildReviewSession();
   final CheckTypedAnswer checkTypedAnswer = const CheckTypedAnswer();
   final GetGoalProgress getGoalProgress = const GetGoalProgress();

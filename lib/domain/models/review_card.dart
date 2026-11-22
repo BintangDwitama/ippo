@@ -10,10 +10,21 @@ enum PromptType {
   soundToCharChoice,
 
   /// Show the character, type the romaji.
-  charToSoundTyped;
+  charToSoundTyped,
+
+  /// Show a word, choose its meaning from four options.
+  wordToMeaningChoice,
+
+  /// Show a meaning, choose the word from four options.
+  meaningToWordChoice;
 
   bool get needsAudio => this == PromptType.soundToCharChoice;
   bool get isTyped => this == PromptType.charToSoundTyped;
+
+  /// Whether this prompt asks about a word rather than a kana.
+  bool get isForWord =>
+      this == PromptType.wordToMeaningChoice ||
+      this == PromptType.meaningToWordChoice;
 }
 
 /// One reviewable question about an item: an item plus a prompt type,

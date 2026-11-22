@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ippo/domain/models/review_card.dart';
@@ -74,7 +76,7 @@ class _Question extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isListening = state.promptType == PromptType.soundToCharChoice;
+    final item = state.item;
     return Padding(
       padding: const EdgeInsets.all(Gaps.page),
       child: Column(
@@ -102,6 +104,10 @@ class _Question extends StatelessWidget {
                           PromptType.soundToCharChoice =>
                             'Which kana makes this sound?',
                           PromptType.charToSoundTyped => 'Type the reading',
+                          PromptType.wordToMeaningChoice =>
+                            'What does this mean?',
+                          PromptType.meaningToWordChoice =>
+                            'Which word means this?',
                         },
                         textAlign: TextAlign.center,
                         style: theme.textTheme.titleMedium?.copyWith(
@@ -109,13 +115,22 @@ class _Question extends StatelessWidget {
                         ),
                       ),
                       Gaps.small,
-                      if (isListening)
-                        AudioButton(
-                          onPressed: viewModel.replaySound,
-                          large: true,
-                        )
-                      else
-                        KanaText(state.item.kana.character, size: 160),
+                      switch (state.promptType) {
+                        PromptType.soundToCharChoice => AudioButton(
+                            onPressed: viewModel.replaySound,
+                            large: true,
+                          ),
+                        PromptType.charToSoundChoice ||
+                        PromptType.charToSoundTyped =>
+                          KanaText(item.kana.character, size: 160),
+                        PromptType.wordToMeaningChoice =>
+                          WordText(item.word, size: 72),
+                        PromptType.meaningToWordChoice => Text(
+                            item.word.meaningText,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.headlineMedium,
+                          ),
+                      },
                     ],
                   ),
                 ),
@@ -123,22 +138,37 @@ class _Question extends StatelessWidget {
             ),
           ),
           Gaps.medium,
-          if (state.promptType.isTyped)
-            _TypedAnswer(onSubmitted: viewModel.answerTyped)
-          else
-            ChoiceGrid(
-              isKana: isListening,
-              labels: [
-                for (final option in state.options)
-                  isListening ? option.kana.character : option.kana.romaji,
-              ],
-              onSelected: (index) =>
-                  viewModel.answerChoice(state.options[index]),
-            ),
+          switch (state.promptType) {
+            PromptType.charToSoundTyped =>
+              _TypedAnswer(onSubmitted: viewModel.answerTyped),
+            PromptType.charToSoundChoice => ChoiceGrid(
+                labels: [for (final o in state.options) o.kana.romaji],
+                onSelected: _select,
+              ),
+            PromptType.soundToCharChoice => ChoiceGrid(
+                isKana: true,
+                labels: [for (final o in state.options) o.kana.character],
+                onSelected: _select,
+              ),
+            PromptType.wordToMeaningChoice => ChoiceList(
+                onSelected: _select,
+                children: [
+                  for (final o in state.options)
+                    MeaningChoice(o.word.meaningText),
+                ],
+              ),
+            PromptType.meaningToWordChoice => ChoiceList(
+                onSelected: _select,
+                children: [for (final o in state.options) WordLine(o.word)],
+              ),
+          },
         ],
       ),
     );
   }
+
+  void _select(int index) =>
+      unawaited(viewModel.answerChoice(state.options[index]));
 }
 
 class _TypedAnswer extends StatefulWidget {
@@ -193,7 +223,6 @@ class _Feedback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.all(Gaps.page),
       child: Column(
@@ -201,25 +230,9 @@ class _Feedback extends StatelessWidget {
           Expanded(
             child: SingleChildScrollView(
               child: Column(
-                children: [
-                  FeedbackBanner(
-                    isCorrect: false,
-                    label: 'Not quite',
-                    detail: 'You answered "${state.givenAnswer}". '
-                        'The answer is ${state.item.kana.character} '
-                        '(${state.item.kana.romaji}).',
-                  ),
-                  Gaps.medium,
-                  KanaText(state.item.kana.character, size: 140),
-                  Text(
-                    state.item.kana.romaji,
-                    style: theme.textTheme.displaySmall,
-                  ),
-                  Gaps.medium,
-                  AudioButton(onPressed: viewModel.replaySound),
-                  Gaps.large,
-                  MnemonicNote(state.mnemonic.text),
-                ],
+                children: state.item.isWord
+                    ? _wordFeedback()
+                    : _kanaFeedback(Theme.of(context)),
               ),
             ),
           ),
@@ -230,5 +243,44 @@ class _Feedback extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  List<Widget> _wordFeedback() {
+    return [
+      if (state.wasCorrect)
+        const FeedbackBanner(isCorrect: true, label: 'Correct')
+      else
+        FeedbackBanner(
+          isCorrect: false,
+          label: 'Not quite',
+          detail: 'You chose "${state.givenAnswer}".',
+        ),
+      Gaps.large,
+      WordDetail(
+        word: state.item.word,
+        onPlay: viewModel.replaySound,
+        voiceAvailable: state.voiceAvailable,
+      ),
+    ];
+  }
+
+  List<Widget> _kanaFeedback(ThemeData theme) {
+    final kana = state.item.kana;
+    final mnemonic = state.mnemonic;
+    return [
+      FeedbackBanner(
+        isCorrect: false,
+        label: 'Not quite',
+        detail: 'You answered "${state.givenAnswer}". '
+            'The answer is ${kana.character} (${kana.romaji}).',
+      ),
+      Gaps.medium,
+      KanaText(kana.character, size: 140),
+      Text(kana.romaji, style: theme.textTheme.displaySmall),
+      Gaps.medium,
+      AudioButton(onPressed: viewModel.replaySound),
+      Gaps.large,
+      if (mnemonic != null) MnemonicNote(mnemonic.text),
+    ];
   }
 }

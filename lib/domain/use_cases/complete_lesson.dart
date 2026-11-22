@@ -5,9 +5,9 @@ import 'package:ippo/domain/models/item.dart';
 import 'package:ippo/domain/models/review_card.dart';
 import 'package:ippo/domain/scheduling/scheduler.dart';
 
-/// Records a finished lesson: marks its kana as introduced and creates
-/// their first review cards, all or nothing. Marks are introduced but get
-/// no cards, because there is nothing to ask about them.
+/// Records a finished lesson: marks its kana or words as introduced and
+/// creates their first review cards, all or nothing. Marks are introduced
+/// but get no cards, because there is nothing to ask about them.
 class CompleteLesson {
   CompleteLesson({
     required this._itemRepository,
@@ -22,6 +22,12 @@ class CompleteLesson {
     PromptType.soundToCharChoice,
   ];
 
+  /// The cards every newly introduced word starts with.
+  static const List<PromptType> wordPromptTypes = [
+    PromptType.wordToMeaningChoice,
+    PromptType.meaningToWordChoice,
+  ];
+
   final ItemRepository _itemRepository;
   final CardRepository _cardRepository;
   final UnitOfWork _unitOfWork;
@@ -34,8 +40,12 @@ class CompleteLesson {
         now,
       );
       for (final item in items) {
-        if (item.kana.isMark) continue;
-        for (final promptType in initialPromptTypes) {
+        final promptTypes = switch (item.kind) {
+          ItemKind.kana =>
+            item.kana.isMark ? const <PromptType>[] : initialPromptTypes,
+          ItemKind.word => wordPromptTypes,
+        };
+        for (final promptType in promptTypes) {
           await _cardRepository.createCard(
             itemId: item.id,
             promptType: promptType,

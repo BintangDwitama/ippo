@@ -75,6 +75,7 @@ class HomeScreen extends StatelessWidget {
                   state: state,
                   onStartReview: () => _open(context, Routes.review),
                   onStartLesson: () => _open(context, Routes.lesson),
+                  onStartWordLesson: () => _open(context, Routes.wordLesson),
                 ),
                 if (state.lessonSize > 0) ...[
                   Gaps.medium,
@@ -85,6 +86,18 @@ class HomeScreen extends StatelessWidget {
                     onStart: state.primaryAction == HomePrimaryAction.review
                         ? () => _open(context, Routes.lesson)
                         : null,
+                  ),
+                ],
+                if (state.wordLessonSize > 0) ...[
+                  Gaps.medium,
+                  _WordLessonCard(
+                    readings: state.nextLessonWords,
+                    // The hero already carries the button when the word
+                    // lesson is the primary action.
+                    onStart:
+                        state.primaryAction == HomePrimaryAction.wordLesson
+                            ? null
+                            : () => _open(context, Routes.wordLesson),
                   ),
                 ],
                 if (!state.needsGoalSetup) ...[
@@ -108,11 +121,13 @@ class _PrimaryActionCard extends StatelessWidget {
     required this.state,
     required this.onStartReview,
     required this.onStartLesson,
+    required this.onStartWordLesson,
   });
 
   final HomeUiState state;
   final VoidCallback onStartReview;
   final VoidCallback onStartLesson;
+  final VoidCallback onStartWordLesson;
 
   static const _label = 'Today\'s step';
 
@@ -148,6 +163,16 @@ class _PrimaryActionCard extends StatelessWidget {
         actionLabel: 'Start lesson',
         onAction: onStartLesson,
       ),
+      HomePrimaryAction.wordLesson => HeroCard(
+        label: _label,
+        figure: '${state.wordLessonSize}',
+        title: state.wordLessonSize == 1
+            ? 'new word to learn'
+            : 'new words to learn',
+        detail: waiting,
+        actionLabel: 'Start word lesson',
+        onAction: onStartWordLesson,
+      ),
       HomePrimaryAction.rest => HeroCard(
         label: _label,
         title: state.isReviewCapReached
@@ -155,7 +180,7 @@ class _PrimaryActionCard extends StatelessWidget {
             : 'All done for now',
         detail: state.isReviewCapReached || nextDue != null
             ? waiting
-            : 'No new kana for today. Come back tomorrow.',
+            : 'Nothing new for today. Come back tomorrow.',
       ),
     };
   }
@@ -218,6 +243,79 @@ class _NextLessonCard extends StatelessWidget {
           if (onStart != null) ...[
             Gaps.medium,
             SecondaryButton(label: 'Start lesson', onPressed: onStart),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// The words the next word lesson introduces.
+class _WordLessonCard extends StatelessWidget {
+  const _WordLessonCard({required this.readings, this.onStart});
+
+  final List<String> readings;
+
+  /// Null when the lesson is started from the primary action instead.
+  final VoidCallback? onStart;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final tokens = context.tokens;
+    return IppoCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 12,
+            children: [
+              Text('Word lesson', style: theme.textTheme.titleMedium),
+              Text(
+                readings.length == 1
+                    ? '1 new word'
+                    : '${readings.length} new words',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+          Gaps.medium,
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final reading in readings)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: scheme.secondaryContainer,
+                    borderRadius: BorderRadius.circular(tokens.smallRadius),
+                  ),
+                  child: Text(
+                    reading,
+                    locale: const Locale('ja'),
+                    textScaler: TextScaler.noScaling,
+                    style: TextStyle(
+                      fontFamily: tokens.kanaFontFamily,
+                      fontSize: 22,
+                      height: 1.2,
+                      color: scheme.onSecondaryContainer,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          if (onStart != null) ...[
+            Gaps.medium,
+            SecondaryButton(label: 'Start word lesson', onPressed: onStart),
           ],
         ],
       ),

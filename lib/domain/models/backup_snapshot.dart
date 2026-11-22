@@ -1,5 +1,6 @@
 import 'package:ippo/domain/models/appearance_mode.dart';
 import 'package:ippo/domain/models/goal.dart';
+import 'package:ippo/domain/models/item.dart';
 import 'package:ippo/domain/models/rating.dart';
 import 'package:ippo/domain/models/reminder_time.dart';
 import 'package:ippo/domain/models/review_card.dart';
@@ -33,6 +34,29 @@ class BackupSnapshot {
 
   int get reviewCount =>
       cards.fold(0, (count, card) => count + card.reviews.length);
+
+  /// This snapshot without anything that belongs to the items named by
+  /// [keys]: their introduction, mnemonics, cards and review history.
+  BackupSnapshot without(Set<String> keys) {
+    if (keys.isEmpty) return this;
+    return BackupSnapshot(
+      exportedAt: exportedAt,
+      introducedItems: [
+        for (final item in introducedItems)
+          if (!keys.contains(item.key)) item,
+      ],
+      learnerMnemonics: [
+        for (final mnemonic in learnerMnemonics)
+          if (!keys.contains(mnemonic.key)) mnemonic,
+      ],
+      cards: [
+        for (final card in cards)
+          if (!keys.contains(card.itemKey)) card,
+      ],
+      goals: goals,
+      settings: settings,
+    );
+  }
 
   /// Every item key the snapshot refers to.
   Set<String> get itemKeys => {
@@ -143,6 +167,7 @@ class BackupSummary {
   const BackupSummary({
     required this.exportedAt,
     required this.introducedCount,
+    required this.wordCount,
     required this.cardCount,
     required this.reviewCount,
   });
@@ -150,14 +175,24 @@ class BackupSummary {
   factory BackupSummary.of(BackupSnapshot snapshot) {
     return BackupSummary(
       exportedAt: snapshot.exportedAt,
-      introducedCount: snapshot.introducedItems.length,
+      introducedCount: snapshot.introducedItems
+          .where((item) => !item.key.startsWith(wordKeyPrefix))
+          .length,
+      wordCount: snapshot.introducedItems
+          .where((item) => item.key.startsWith(wordKeyPrefix))
+          .length,
       cardCount: snapshot.cards.length,
       reviewCount: snapshot.reviewCount,
     );
   }
 
   final DateTime exportedAt;
+
+  /// Kana that have been introduced.
   final int introducedCount;
+
+  /// Words that have been introduced.
+  final int wordCount;
   final int cardCount;
   final int reviewCount;
 }

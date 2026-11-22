@@ -252,6 +252,11 @@ class _Confirming extends StatelessWidget {
                 onPhone: '${state.onPhone.introducedCount}',
               ),
               _SummaryRow(
+                label: 'Words learned',
+                inFile: '${state.inFile.wordCount}',
+                onPhone: '${state.onPhone.wordCount}',
+              ),
+              _SummaryRow(
                 label: 'Cards',
                 inFile: '${state.inFile.cardCount}',
                 onPhone: '${state.onPhone.cardCount}',
@@ -264,6 +269,17 @@ class _Confirming extends StatelessWidget {
             ],
           ),
         ),
+        if (state.skippedWords > 0) ...[
+          Gaps.medium,
+          Text(
+            state.skippedWords == 1
+                ? '1 word in the file is not in this version of Ippo '
+                    'and will be left out.'
+                : '${state.skippedWords} words in the file are not in '
+                    'this version of Ippo and will be left out.',
+            style: theme.textTheme.bodyLarge,
+          ),
+        ],
         Gaps.medium,
         Text(
           'Everything on this phone will be replaced by the file. This '

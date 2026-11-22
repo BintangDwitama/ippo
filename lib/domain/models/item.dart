@@ -81,6 +81,10 @@ class KanaPayload extends ItemPayload {
   List<String> get acceptedRomaji => [romaji, ...alternativeRomaji];
 }
 
+/// How the key of every word item begins; the rest is the word's
+/// identifier in the word list.
+const String wordKeyPrefix = 'word:';
+
 /// A word of the beginner word list.
 @immutable
 class WordPayload extends ItemPayload {

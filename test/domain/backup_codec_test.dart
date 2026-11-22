@@ -126,14 +126,14 @@ void main() {
     expect(snapshot.goals.first.targetSet, GoalTargetSet.hiragana);
   });
 
-  test('writes version 2 and round-trips the new goal target sets', () {
+  test('writes the current version and round-trips the new goal target sets', () {
     final original = codec.decode(
       File('test/fixtures/backup_v2.json').readAsStringSync(),
     );
 
     final text = codec.encode(original);
 
-    expect(text, contains('"formatVersion":2'));
+    expect(text, contains('"formatVersion":${BackupCodec.formatVersion}'));
     expect(
       codec.decode(text).goals.map((g) => g.targetSet),
       [GoalTargetSet.hiragana, GoalTargetSet.hiraganaExtended],

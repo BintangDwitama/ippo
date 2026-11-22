@@ -111,6 +111,10 @@ void main() {
       200,
       scrollable: find.byType(Scrollable).last,
     );
+    // The summary gained a row for words, so the button can sit half
+    // off the bottom when it is first built.
+    await tester.ensureVisible(find.text('Cancel'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
 

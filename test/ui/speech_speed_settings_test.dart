@@ -196,7 +196,7 @@ void main() {
         await bringIntoView(tester, find.text('Speaking speed'));
         await bringIntoView(tester, find.text('Very slow'));
         await bringIntoView(tester, find.text('Play a sample'));
-        await bringIntoView(tester, find.text('Open-source licences'));
+        await bringIntoView(tester, find.text('About and sources'));
       });
     }
   });

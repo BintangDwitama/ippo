@@ -49,7 +49,13 @@ class BackupViewModel extends ViewModel {
       if (text == null) return _showIdle();
       final preview = await _deps.readBackup(text: text, now: _deps.clock());
       _pending = preview.snapshot;
-      _show(BackupConfirming(inFile: preview.inFile, onPhone: preview.onPhone));
+      _show(
+        BackupConfirming(
+          inFile: preview.inFile,
+          onPhone: preview.onPhone,
+          skippedWords: preview.skippedWords,
+        ),
+      );
     } on BackupFormatException catch (error) {
       await _showIdle(switch (error.problem) {
         BackupFormatProblem.notABackup => BackupNotice.notABackup,

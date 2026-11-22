@@ -31,8 +31,6 @@ class WordSeedLoader {
   /// Words sort after every kana, in the list's own order.
   static const int sortOrderBase = 100000;
 
-  static const String keyPrefix = 'word:';
-
   final ItemRepository _itemRepository;
   final Future<String> Function() _loadSeedJson;
 
@@ -98,7 +96,7 @@ class WordSeedLoader {
     }
     return SeedItem(
       kind: ItemKind.word,
-      key: '$keyPrefix$id',
+      key: '$wordKeyPrefix$id',
       sortOrder: sortOrderBase + order,
       payload: WordPayload(
         reading: reading,

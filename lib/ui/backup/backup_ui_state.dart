@@ -46,8 +46,16 @@ class BackupWorking extends BackupUiState {
 /// A backup file has been read; the learner decides whether it replaces
 /// the data on the phone.
 class BackupConfirming extends BackupUiState {
-  const BackupConfirming({required this.inFile, required this.onPhone});
+  const BackupConfirming({
+    required this.inFile,
+    required this.onPhone,
+    this.skippedWords = 0,
+  });
 
   final BackupSummary inFile;
   final BackupSummary onPhone;
+
+  /// Words in the file that this version of the app does not have; they
+  /// will be left out.
+  final int skippedWords;
 }

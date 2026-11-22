@@ -169,12 +169,13 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 const Divider(),
                 ListTile(
-                  leading: const Icon(Icons.description_outlined),
-                  title: const Text('Open-source licences'),
-                  onTap: () => showLicensePage(
-                    context: context,
-                    applicationName: 'Ippo',
+                  leading: const Icon(Icons.info_outline),
+                  title: const Text('About and sources'),
+                  subtitle: const Text(
+                    'Where the words come from, and licences',
                   ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push(Routes.about),
                 ),
               ],
             ),

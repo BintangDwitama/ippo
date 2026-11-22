@@ -46,10 +46,11 @@ class BackupCodec {
 
   /// The version this app writes, and the newest it can read.
   ///
-  /// Version 2 has the structure of version 1. The number was raised when
-  /// voiced and combination kana arrived, so that an older app refuses a
-  /// newer file as "needs a newer version" and not as damaged.
-  static const int formatVersion = 2;
+  /// Versions 2 and 3 have the structure of version 1. The number was
+  /// raised when voiced and combination kana arrived, and again when
+  /// words did, so that an older app refuses a newer file as "needs a
+  /// newer version" and not as damaged.
+  static const int formatVersion = 3;
 
   String encode(BackupSnapshot snapshot) {
     return jsonEncode({

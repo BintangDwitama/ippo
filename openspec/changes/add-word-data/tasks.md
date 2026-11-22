@@ -43,7 +43,7 @@
 ## 6. Monthly rebuild
 
 - [x] 6.1 Add `.github/workflows/update-words.yml`: monthly and on request; install Flutter; run the build and the word tests; on a change push a branch and open a pull request
-- [ ] 6.2 Run the workflow once by hand and confirm it completes and proposes nothing when the data is current
+- [x] 6.2 Run the workflow once by hand and confirm it completes and proposes nothing when the data is current
 - [ ] 6.3 The owner allows workflows to create pull requests in the repository's settings, or accepts opening them by hand
 
 ## 7. Checks

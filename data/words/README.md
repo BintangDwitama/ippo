@@ -11,8 +11,9 @@ reading, written form, meanings and the kana needed to read each one.
 | `sources/` | The beginner vocabulary list the words are chosen from. |
 | `LICENSE` | The licence for everything in this folder. |
 
-The app does not use these files yet. They are not part of the installed
-app.
+`words.json` is bundled in the app as it is: the app teaches these words
+and keeps the learner's progress when the list changes. The other files
+are not part of the installed app.
 
 ## Sources and credit
 

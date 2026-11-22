@@ -43,13 +43,26 @@ No schema migration: `kind` and `promptType` are text columns holding enum names
 
 **Every existing reader of items must choose a kind.** Nineteen files read `item.kana` today. Each is audited (task group 2): the kana grid, kana status, goal progress, daily kana quota, kana lesson, kana choice options, home and the review screen. Statistics that mean "reviews done" (streak, daily review cap) count all cards; anything that means "kana" filters by kind. This audit is the main risk of the change and is covered by tests that seed words into the existing use-case tests.
 
+Result of the audit:
+
+| What | Counts |
+|---|---|
+| Goal progress and accuracy, daily kana quota, kana lesson, kana grid, kana status, kana answer options | kana only (each already filtered by kind, or is reached only from a kana) |
+| Streak | any study: a review of any card, or a lesson of either kind |
+| Daily review cap, reviews today, review session | all cards |
+| Backup summary | kana and words counted apart |
+
+No existing reader needed a fix; `GetNextLesson`, `GetGoalProgress`, `BuildChoiceOptions` and the kana grid already filtered by kind. Tests now pin that.
+
 ### 3. Loading and syncing 1,291 words at launch
 
 A `WordSeedLoader` parses the asset into `SeedItem`s and calls the existing `syncSeedItems`. Parsing checks the header's `format` and `formatVersion` and fails loudly on a file it does not understand.
 
-`syncSeedItems` today compares item by item, which is fine for 211. For 1,502 it must read all stored items once, compare in memory, and write only differences in one batch inside one transaction. First launch after the update inserts 1,291 rows; later launches write nothing.
+`syncSeedItems` already reads all stored items once, compares in memory and writes only differences inside one transaction. What it did one row at a time was inserting; new items without a mnemonic (all words) are now written in one batch. First launch after the update inserts 1,291 rows; later launches write nothing.
 
 Launch must not visibly slow down. The target on the owner's phone: first launch after update under one second for the sync, later launches under 100 ms. If parsing 240 KB of JSON on the UI thread drops frames, it moves to an isolate (`compute`). Measured in task 3.5 before deciding.
+
+On the development computer, against a database file: the first sync (1,291 inserts) takes about 100 ms including 25 ms to parse; a later launch with nothing to change takes 20 to 35 ms; reading all 1,502 items takes 17 ms. A phone is slower; the app prints the time in debug and profile builds (`Seed sync took N ms`) for the on-phone check.
 
 Words dropped from a later list stay in the database (the sync never removes). A learned word keeps its cards; an unlearned one would still be offered. To prevent that, the loader's set of current keys is kept in memory and the lesson chooser only offers words in it (decision 4).
 
@@ -78,6 +91,8 @@ Layout of a word, used in the lesson, in review prompts, in options and in feedb
 
 Check options come from the same use case as review options (decision 7), with the lesson's own words counted as known.
 
+Meanings and whole words do not fit the two-by-two answer grid used for kana, so word answers are a column of four full-width buttons (`ChoiceList`); a meaning may wrap to two lines.
+
 ### 6. Completing a lesson
 
 `CompleteLesson` takes items of either kind and creates cards by kind: kana as today; words get `wordToMeaningChoice` and `meaningToWordChoice`. One transaction, as today.
@@ -94,7 +109,7 @@ Check options come from the same use case as review options (decision 7), with t
 - pool 3: words that are available by decision 4 but not yet introduced;
 - pool 4: any other word of the list (reachable only in tests and odd states; guarantees four options).
 
-Pools are shuffled and drawn in order until three are found. The same options serve both prompt types: shown as meanings for word to meaning, as words for meaning to word.
+Pools are shuffled and drawn in order until three are found. Two wrong options never share a reading or have identical meanings with each other either. The same options serve both prompt types: shown as meanings for word to meaning, as words for meaning to word.
 
 Why exclude shared meanings: 暑い "hot" and 熱い "hot to the touch" do not collide, but お父さん and 父 both mean "father", and offering one as a wrong answer for the other would be a trick. Why prefer the same part of speech: every verb's meaning starts with "to", so a lone verb among nouns gives itself away.
 
@@ -104,9 +119,11 @@ No graduation: `GradeAnswer` creates a typed card only for kana, as today. The c
 
 ### 8. Review screen
 
-The review ViewModel builds a per-card presentation by prompt type. Word cards add two variants to the UI state: prompt as `WordText` with meaning options; prompt as meanings with `WordText` options. Feedback for word cards always shows the word in full and speaks it, right or wrong; it is the only listening practice words get in this change.
+The review ViewModel builds a per-card presentation by prompt type. Word cards add two variants to the UI state: prompt as `WordText` with meaning options; prompt as meanings with `WordText` options. After every answer to a word card, right or wrong, a feedback step shows the word in full and speaks it, and the learner taps Continue. It is the only listening practice words get in this change.
 
-Speaking after a correct answer must not slow the session: the next card may be advanced while the word is still being spoken, and a new sound interrupts the old one, as `SpeechRepository.speak` already does.
+The first plan was to speak the word while moving straight on after a correct answer. That would play one word's sound over the next card, which may be another word: hearing あめ while reading いぬ teaches the wrong thing. The extra tap is the price of hearing each word against its own meaning and written form.
+
+A word shown as a question is never read out, and its audio control is absent: on a meaning-to-word card the sound would give the answer away.
 
 `BuildReviewSession` is unchanged: it works on cards and already separates cards of the same item.
 
@@ -128,7 +145,7 @@ Order of the primary action: review, kana lesson, word lesson, rest. Kana before
 - The dictionary date, read from the bundled list's header through the word seed loader (exposed by a small `WordListInfo` value), not hard-coded.
 - The JLPT lists: Jonathan Waller (CC BY), matched by Stephen Kraus (CC BY-SA 4.0), addresses.
 - That the app's word list is a changed selection, shared under CC BY-SA 4.0, with the repository address of `data/words`.
-- A "Licences" row opening Flutter's built-in licence page, which already carries package licences; the bundled font licences are registered with `LicenseRegistry` from `assets/fonts/licenses/` if they are not there already.
+- A "Licences" row opening Flutter's built-in licence page. The bundled font licences were already registered there. The row replaces the "Open-source licences" row that settings had, so licences live in one place.
 
 Addresses are shown as selectable text. No `url_launcher`: it would be a new dependency and a new way out of an offline app for four links.
 

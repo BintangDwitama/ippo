@@ -28,6 +28,22 @@ The seed file is the source of app-owned content. On every launch the app
 adds missing kana and updates the reading, order and default mnemonic of
 existing ones; it never changes the learner's progress or own mnemonics.
 
+## Words
+
+About 1,300 beginner words (JLPT N5, then N4). A word becomes available
+once every kana in it has been introduced, so the first words arrive
+after the first row: あい, いえ, うえ. A word lesson teaches up to five new
+words a day, apart from the day's kana.
+
+Each word is shown as its reading in kana with the written form small
+beneath it. The written form is not asked about; it tells apart words
+that share a reading (雨 and 飴 are both あめ). Each word gets two review
+cards, word to meaning and meaning to word, mixed into the same review
+session as kana. After every answer the word is shown in full and spoken.
+
+On every launch the app adds words that are new in the bundled list and
+updates meanings that were corrected; it never changes progress.
+
 ## Your data
 
 Progress is stored only on the phone. Settings > Backup and restore saves
@@ -37,7 +53,9 @@ after showing what the file holds. Android's own backup also includes the
 database when backup is turned on in the phone's settings.
 
 A backup written by a newer version of the app cannot be imported by an
-older one; the older app says it needs a newer version.
+older one; the older app says it needs a newer version. If a backup
+names a word that this version's list no longer has, the rest is imported
+and the summary says how many words are left out.
 
 When developing: export before installing a build that may need the app
 to be uninstalled first (for example one signed with a different key),
@@ -66,8 +84,9 @@ flutter test
 
 ## Word data
 
-`data/words/` holds a list of about 1,300 beginner words, ready for the
-next stage of the app. It is not used by the app yet.
+`data/words/` holds the list of about 1,300 beginner words the app
+teaches. `words.json` is bundled in the app; Settings > About and sources
+credits where it comes from.
 
 The list is built from [JMdict](https://www.edrdg.org/wiki/index.php/JMdict-EDICT_Dictionary_Project),
 the property of the Electronic Dictionary Research and Development Group,
@@ -87,13 +106,15 @@ lib/
   routing/                go_router routes
   ui/                     screens, one ViewModel and UiState per screen
   ui/backup/              export and import of the learner's data
+  ui/word_lesson/         lessons that introduce words
+  ui/about/               credits for the dictionary and word lists
   ui/core/theme/          design tokens and the Daylight, Night and Paper themes
   ui/core/widgets/        shared widgets; they read tokens, never a theme name
   domain/                 models, the scheduler, use cases
   data/                   repositories, services, seed loader
 assets/seed/kana.json     the 211 kana with readings, groups, rows and mnemonics
 assets/fonts/             bundled fonts (SIL Open Font License) and their licences
-data/words/               the beginner word list, built from JMdict (not yet in the app)
+data/words/               the beginner word list, built from JMdict; words.json is bundled
 tool/words/               the script that builds it
 openspec/                 specs, design and tasks for each change
 ```

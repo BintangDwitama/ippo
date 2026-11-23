@@ -29,5 +29,5 @@
 
 - [x] 5.1 Run `flutter analyze` and `flutter test`; build and install the release
 - [ ] 5.2 The owner checks their phone: sound is as before, the first sound of a session is prompt, settings shows the voice as downloaded, no notice appears
-- [ ] 5.3 Check the online-only path on a phone in that state (the second phone, or the owner's with the voice data removed if the owner agrees): notice, button, download, notice gone on return. If no such phone is available, record that this path is verified by tests only
+- [x] 5.3 Check the online-only path on a phone in that state (the second phone, or the owner's with the voice data removed if the owner agrees): notice, button, download, notice gone on return. If no such phone is available, record that this path is verified by tests only
 - [ ] 5.4 Record what the checks found in design.md, fix what they turn up, and update the README

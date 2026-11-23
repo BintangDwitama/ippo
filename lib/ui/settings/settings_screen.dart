@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ippo/ui/core/widgets/voice_help.dart';
+import 'package:ippo/domain/models/japanese_voice.dart';
 import 'package:ippo/domain/models/appearance_mode.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ippo/domain/models/reminder_time.dart';
@@ -114,14 +116,44 @@ class SettingsScreen extends StatelessWidget {
                         : Icons.voice_over_off_outlined,
                   ),
                   title: const Text('Japanese voice'),
-                  subtitle: Text(
-                    state.isJapaneseVoiceAvailable
-                        ? 'Available. Kana are read aloud.'
-                        : 'Not installed. Add Japanese in your phone\'s '
-                              'text-to-speech settings to hear the kana. '
-                              'Listening reviews are paused until then.',
-                  ),
+                  subtitle: Text(switch (state.japaneseVoice) {
+                    JapaneseVoice.ready =>
+                      'Downloaded. Kana and words are read aloud.',
+                    JapaneseVoice.onlineOnly =>
+                      'Not downloaded. Sound may be late, or missing '
+                          'without internet. Download the voice to fix '
+                          'this.',
+                    JapaneseVoice.missing =>
+                      'Not installed. Kana and words cannot be read '
+                          'aloud, and listening reviews are paused until '
+                          'a Japanese voice is added.',
+                  }),
                 ),
+                if (state.japaneseVoice.needsDownload)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (state.voiceDownloadUnavailable)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Text(
+                              VoiceHelp.whereToFindIt,
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                          ),
+                        OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size(48, 48),
+                          ),
+                          onPressed: viewModel.openVoiceDownload,
+                          icon: const Icon(Icons.download_outlined),
+                          label: const Text(VoiceHelp.downloadLabel),
+                        ),
+                      ],
+                    ),
+                  ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                   child: Text(
@@ -231,13 +263,11 @@ class _SpeedOption extends StatelessWidget {
               : Icons.radio_button_unchecked,
           color: isSelected ? scheme.primary : scheme.onSurfaceVariant,
         ),
-        title: Text(
-          switch (speed) {
-            SpeechSpeed.normal => 'Normal',
-            SpeechSpeed.slow => 'Slow',
-            SpeechSpeed.verySlow => 'Very slow',
-          },
-        ),
+        title: Text(switch (speed) {
+          SpeechSpeed.normal => 'Normal',
+          SpeechSpeed.slow => 'Slow',
+          SpeechSpeed.verySlow => 'Very slow',
+        }),
         onTap: onSelected,
       ),
     );

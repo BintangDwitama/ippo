@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:ippo/domain/models/goal.dart';
+import 'package:ippo/domain/models/japanese_voice.dart';
 import 'package:ippo/domain/use_cases/get_goal_progress.dart';
 
 /// What the home screen puts forward as the one thing to do next.
@@ -30,7 +31,8 @@ class HomeUiState {
     this.streak = 0,
     this.nextDue,
     this.isReviewCapReached = false,
-    this.showVoiceNotice = false,
+    this.voiceNotice,
+    this.voiceDownloadUnavailable = false,
   });
 
   final bool isLoading;
@@ -57,8 +59,15 @@ class HomeUiState {
   /// Cards are due, but today's review cap has been reached.
   final bool isReviewCapReached;
 
-  /// Whether to tell the learner that no Japanese voice is installed.
-  final bool showVoiceNotice;
+  /// The state of the Japanese voice to tell the learner about: missing
+  /// or not downloaded. Null when there is nothing to say.
+  final JapaneseVoice? voiceNotice;
+
+  /// The phone could not open its voice download screen, so the notice
+  /// must say where to find it.
+  final bool voiceDownloadUnavailable;
+
+  bool get showVoiceNotice => voiceNotice != null;
 
   bool get needsGoalSetup => !isLoading && goal == null;
 

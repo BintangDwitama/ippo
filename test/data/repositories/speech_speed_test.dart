@@ -30,6 +30,15 @@ class _FakeTtsService implements TtsService {
   }
 
   @override
+  Future<bool?> isJapaneseInstalled() async => true;
+
+  @override
+  Future<List<TtsVoice>> japaneseVoices() async => const [];
+
+  @override
+  Future<void> setUpJapanese({TtsVoice? voice}) async {}
+
+  @override
   Future<void> speakJapanese(String text, {required double rate}) async {
     spoken.add((text, rate));
   }

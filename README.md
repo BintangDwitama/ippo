@@ -16,8 +16,13 @@ icon images are drawn from the bundled font by
 The look is chosen in Settings > Appearance: Automatic (Daylight by day,
 Night in dark mode), Daylight, Night or Paper. All themes share one layout.
 
-Kana are read aloud by the phone's Japanese voice. Settings > Sound sets
-the speaking speed (Normal, Slow or Very slow) and plays a sample.
+Kana and words are read aloud by the phone's own Japanese voice; the app
+carries no audio. If that voice is not downloaded, the phone may fetch
+each sound over the network, so sound is late, or missing offline. The
+app says so on the home screen and in Settings > Sound, with a button
+that opens the phone's voice download screen, and notices when the voice
+has arrived. Settings > Sound also sets the speaking speed (Normal, Slow
+or Very slow) and plays a sample.
 
 ## What it teaches
 

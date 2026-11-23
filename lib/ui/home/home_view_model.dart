@@ -5,6 +5,7 @@ import 'package:ippo/app_dependencies.dart';
 import 'package:ippo/data/repositories/settings_repository.dart';
 import 'package:ippo/domain/models/goal.dart';
 import 'package:ippo/domain/models/item.dart';
+import 'package:ippo/domain/models/japanese_voice.dart';
 import 'package:ippo/domain/models/review_card.dart';
 import 'package:ippo/domain/models/review_record.dart';
 import 'package:ippo/domain/use_cases/save_goal.dart';
@@ -44,7 +45,8 @@ class HomeViewModel extends ViewModel {
   Goal? _goal;
   bool _goalLoaded = false;
   int _dailyCap = SettingsRepository.defaultDailyReviewCap;
-  bool? _voiceAvailable;
+  JapaneseVoice? _voice;
+  bool _voiceDownloadUnavailable = false;
   bool _voiceNoticeShown = true;
 
   HomeUiState _uiState = const HomeUiState();
@@ -54,7 +56,9 @@ class HomeViewModel extends ViewModel {
   /// current time. Call when the screen becomes visible again.
   Future<void> refresh() async {
     _dailyCap = await _deps.settingsRepository.getDailyReviewCap();
-    _voiceAvailable = await _deps.speechRepository.isJapaneseVoiceAvailable();
+    // Asked afresh each time the screen is shown: the learner may have
+    // just downloaded the voice.
+    _voice = await _deps.speechRepository.getJapaneseVoice();
     _voiceNoticeShown = await _deps.settingsRepository.isVoiceNoticeShown();
     _recompute();
   }
@@ -69,6 +73,15 @@ class HomeViewModel extends ViewModel {
     );
   }
 
+  /// Opens the phone's voice download screen. If the phone has none,
+  /// the notice then explains where to look instead.
+  Future<void> openVoiceDownload() async {
+    final opened = await _deps.speechRepository.openVoiceDownload();
+    if (_voiceDownloadUnavailable == !opened) return;
+    _voiceDownloadUnavailable = !opened;
+    _recompute();
+  }
+
   Future<void> dismissVoiceNotice() async {
     await _deps.settingsRepository.setVoiceNoticeShown();
     _voiceNoticeShown = true;
@@ -79,16 +92,17 @@ class HomeViewModel extends ViewModel {
     final items = _items;
     final cards = _cards;
     final reviews = _reviews;
-    final voiceAvailable = _voiceAvailable;
+    final voice = _voice;
     if (items == null ||
         cards == null ||
         reviews == null ||
-        voiceAvailable == null ||
+        voice == null ||
         !_goalLoaded) {
       return;
     }
     final now = _deps.clock();
     final goal = _goal;
+    final voiceAvailable = voice.canSpeak;
 
     final progress = goal == null
         ? null
@@ -161,7 +175,8 @@ class HomeViewModel extends ViewModel {
       ),
       nextDue: dueCount == 0 && upcoming.isNotEmpty ? upcoming.first : null,
       isReviewCapReached: dueCount == 0 && dueIgnoringCap > 0,
-      showVoiceNotice: !voiceAvailable && !_voiceNoticeShown,
+      voiceNotice: voice.needsDownload && !_voiceNoticeShown ? voice : null,
+      voiceDownloadUnavailable: _voiceDownloadUnavailable,
     );
     notify();
   }

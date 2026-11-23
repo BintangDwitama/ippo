@@ -1,3 +1,4 @@
+import 'package:ippo/domain/models/japanese_voice.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ippo/data/repositories/settings_repository.dart';
 import 'package:ippo/domain/models/appearance_mode.dart';
@@ -11,7 +12,8 @@ class SettingsUiState {
     this.dailyReviewCap = SettingsRepository.defaultDailyReviewCap,
     this.reminderTime,
     this.isReminderPermissionDenied = false,
-    this.isJapaneseVoiceAvailable = true,
+    this.japaneseVoice = JapaneseVoice.ready,
+    this.voiceDownloadUnavailable = false,
     this.appearanceMode = AppearanceMode.automatic,
     this.speechSpeed = SpeechSpeed.fallback,
   });
@@ -24,7 +26,12 @@ class SettingsUiState {
 
   /// The learner tried to turn the reminder on but refused permission.
   final bool isReminderPermissionDenied;
-  final bool isJapaneseVoiceAvailable;
+  final JapaneseVoice japaneseVoice;
+
+  /// The phone could not open its voice download screen.
+  final bool voiceDownloadUnavailable;
+
+  bool get isJapaneseVoiceAvailable => japaneseVoice.canSpeak;
   final AppearanceMode appearanceMode;
   final SpeechSpeed speechSpeed;
 

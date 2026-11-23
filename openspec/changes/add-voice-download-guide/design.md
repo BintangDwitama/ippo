@@ -47,15 +47,15 @@ Android defines `TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA`: an activity of th
 
 `SpeechRepository.openVoiceDownload()` returns that boolean; false also where there is no Android side. The UI shows the written instructions when it is false.
 
-Whether the intent should be aimed at the default engine's package or left open is checked against the documentation in the first task. Left open, a phone with two engines shows a chooser; aimed, it goes straight to the engine actually in use.
+The documentation gives no guidance on aiming the intent at one engine. The implementation tries the engine in use first (the system's `tts_default_synth` setting) and, if that cannot be started, the open intent; false only when both fail. Aimed, a phone with two engines goes straight to the one actually speaking.
 
 Alternative: open the system's text-to-speech settings page. Rejected as the first choice because it leaves the learner two or three taps from the download, on a page that differs per phone maker; it is the fallback the instructions describe.
 
 ### 4. Preferring a downloaded voice
 
-When Japanese is first set up, `TtsService` reads the voice list and, if any `ja-JP` voice has `network_required` false and is not marked not-installed, selects it with `setVoice`. Otherwise it only sets the language, as today, and the engine decides.
+The rule, after seeing what a real engine reports (see Findings): when Japanese is set up, the app reads the voice list. If the voice the engine uses for the language by default (marked `legacySetLanguageVoice`) works offline, the app only sets the language and leaves the choice to the engine, so a phone that already sounds right keeps its voice. Only when that default would need the network, or its data is not downloaded, and another Japanese voice works offline, does the app ask for that one by name (the first by name, so the choice does not depend on the engine's order). With no offline voice, the engine decides, as before.
 
-Among several downloaded voices the first in the engine's order is taken. The owner's phone sounded right with the engine's default; the task list checks that selecting a voice explicitly does not change which voice the owner hears, and if it does, the selection applies only when the engine's default is an online voice.
+The first design selected any downloaded voice. On the owner's phone that would have swapped the default voice for a differently named one and possibly changed how the app sounds, for no gain.
 
 Selection is redone when a recheck finds the state changed, so a voice downloaded mid-session is used from the next sound.
 
@@ -84,6 +84,19 @@ Button: "Download voice". On failure to open, a short message with the path: Set
 - **ViewModels**: home and settings show each state, recheck on refresh, and report whether the download screen opened.
 - **Widgets**: notice and settings row in each state, in three themes on a small screen with large text; the button; the fallback message.
 - **On a phone**: the owner's phone should report ready and sound as before. The online-only path needs a phone in that state: the second phone, or the owner's with the Japanese voice data removed and restored (the owner's choice; not done without asking).
+
+## Findings
+
+**The second phone (task 1.1)**: not checked. The owner started the work without reporting the airplane-mode test, so the cause of the delay there remains a suspicion.
+
+**Documentation (task 1.2)**, read 2026-11-23:
+
+- `ACTION_INSTALL_TTS_DATA` "Triggers the platform TextToSpeech engine to start the activity that installs the resource files on the device that are required for TTS to be operational." The app "shouldn't expect successful installation upon return from that intent", which is why the state is rechecked instead of assumed.
+- The "not installed" feature means "the voice may need to download additional data to be fully functional. The download will be triggered by calling setVoice(Voice) or setLanguage(Locale). Until download is complete, each synthesis request will either report ERROR_NOT_INSTALLED_YET error, or use a different voice to synthesize the request." So merely using the app may start the download, and until it finishes sound can come from another, possibly online, voice. This matches late sound on a phone that has never spoken Japanese, and it means the delay may cure itself once the download completes.
+- A network voice's expected latency is documented as about 200 ms or more, against 20 to 50 ms for a local one.
+- The manifest already declares the text-to-speech service in `queries`, as required from Android 11.
+
+**The owner's phone (task 1.3)**, Samsung SM-S731B, Android 16, read with a temporary build that was removed afterwards: the engine is Google's (`com.google.android.tts`); Japanese is available and installed; of 474 voices, 9 are Japanese: `ja-JP-language` (offline, the language default), four `-local` voices (offline) and four `-network` voices. So this phone is in the ready state, the engine's default is already offline, and the app asks for no voice by name.
 
 ## Risks / Trade-offs
 

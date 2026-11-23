@@ -2,7 +2,10 @@ package com.bintangdwitama.ippo
 
 import android.app.UiModeManager
 import android.content.Context
+import android.content.Intent
 import android.os.Build
+import android.provider.Settings
+import android.speech.tts.TextToSpeech
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -19,7 +22,41 @@ class MainActivity : FlutterActivity() {
                     result.notImplemented()
                 }
             }
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, SPEECH_CHANNEL)
+            .setMethodCallHandler { call, result ->
+                if (call.method == "openVoiceDownload") {
+                    result.success(openVoiceDownload())
+                } else {
+                    result.notImplemented()
+                }
+            }
     }
+
+    /**
+     * Opens the speech engine's screen for downloading voice data, and
+     * says whether it could be opened. The engine in use is tried first,
+     * so a phone with two engines goes to the right one; then any engine.
+     */
+    private fun openVoiceDownload(): Boolean {
+        val engine = Settings.Secure.getString(contentResolver, "tts_default_synth")
+        val attempts = listOfNotNull(
+            engine?.takeIf { it.isNotBlank() }?.let { installIntent().setPackage(it) },
+            installIntent(),
+        )
+        for (intent in attempts) {
+            try {
+                startActivity(intent)
+                return true
+            } catch (e: Exception) {
+                // No such screen in this engine, or not allowed: try the next.
+            }
+        }
+        return false
+    }
+
+    private fun installIntent(): Intent =
+        Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
     /**
      * Tells the system whether the app is light or dark, so that the
@@ -45,5 +82,6 @@ class MainActivity : FlutterActivity() {
 
     private companion object {
         const val CHANNEL = "ippo/launch_appearance"
+        const val SPEECH_CHANNEL = "ippo/speech_setup"
     }
 }

@@ -14,5 +14,6 @@ export 'mnemonic_note.dart';
 export 'progress_meter.dart';
 export 'session_app_bar.dart';
 export 'streak_badge.dart';
+export 'voice_help.dart';
 export 'word_detail.dart';
 export 'word_text.dart';

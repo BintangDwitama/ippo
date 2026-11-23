@@ -76,6 +76,11 @@ Future<void> main() async {
     ),
   );
 
+  // Wakes the speech engine now, so the first sound of a lesson does
+  // not wait for it. After the first frame: sound can wait, the screen
+  // cannot.
+  unawaited(dependencies.speechRepository.prepare());
+
   // The phone may have restored the app's data without the app knowing,
   // which brings back the reminder setting but not its schedule. A
   // failure here must not stop the app; the reminder is a convenience.

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ippo/domain/models/goal.dart';
+import 'package:ippo/domain/models/japanese_voice.dart';
 import 'package:ippo/domain/use_cases/get_goal_progress.dart';
 import 'package:ippo/routing/routes.dart';
 import 'package:ippo/ui/core/spacing.dart';
@@ -61,7 +62,12 @@ class HomeScreen extends StatelessWidget {
               padding: Gaps.pagePadding(context),
               children: [
                 if (state.showVoiceNotice) ...[
-                  _VoiceNotice(onDismiss: viewModel.dismissVoiceNotice),
+                  _VoiceNotice(
+                    voice: state.voiceNotice!,
+                    downloadUnavailable: state.voiceDownloadUnavailable,
+                    onDownload: viewModel.openVoiceDownload,
+                    onDismiss: viewModel.dismissVoiceNotice,
+                  ),
                   Gaps.medium,
                 ],
                 if (state.needsGoalSetup) ...[
@@ -408,38 +414,72 @@ class _GoalSummary extends StatelessWidget {
 }
 
 class _VoiceNotice extends StatelessWidget {
-  const _VoiceNotice({required this.onDismiss});
+  const _VoiceNotice({
+    required this.voice,
+    required this.downloadUnavailable,
+    required this.onDownload,
+    required this.onDismiss,
+  });
 
+  final JapaneseVoice voice;
+  final bool downloadUnavailable;
+  final VoidCallback onDownload;
   final VoidCallback onDismiss;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
     final textTheme = Theme.of(context).textTheme;
+    final isMissing = voice == JapaneseVoice.missing;
     return IppoCard(
       color: tokens.wrong,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'No Japanese voice found',
+            isMissing
+                ? 'No Japanese voice found'
+                : 'Japanese voice not downloaded',
             style: textTheme.titleMedium?.copyWith(color: tokens.onWrong),
           ),
           Gaps.small,
           Text(
-            'To hear the kana, install Japanese in your phone\'s '
-            'text-to-speech settings (Settings > Accessibility > '
-            'Text-to-speech > Install voice data). Lessons and reading '
-            'reviews work without it; listening reviews are paused.',
+            isMissing
+                ? 'Ippo reads kana and words aloud with your phone\'s '
+                    'Japanese voice, and this phone has none. Lessons and '
+                    'reading reviews work without it; listening reviews '
+                    'are paused.'
+                : 'Sound may be late, or missing without internet, because '
+                    'your phone fetches the Japanese voice as it speaks. '
+                    'Downloading the voice fixes this.',
             style: textTheme.bodyMedium?.copyWith(color: tokens.onWrong),
           ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              style: TextButton.styleFrom(foregroundColor: tokens.onWrong),
-              onPressed: onDismiss,
-              child: const Text('Got it'),
+          if (downloadUnavailable) ...[
+            Gaps.small,
+            Text(
+              VoiceHelp.whereToFindIt,
+              style: textTheme.bodyMedium?.copyWith(color: tokens.onWrong),
             ),
+          ],
+          Gaps.small,
+          Wrap(
+            alignment: WrapAlignment.end,
+            spacing: 8,
+            children: [
+              TextButton(
+                style: TextButton.styleFrom(foregroundColor: tokens.onWrong),
+                onPressed: onDismiss,
+                child: const Text('Got it'),
+              ),
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: tokens.onWrong,
+                  side: BorderSide(color: tokens.onWrong),
+                ),
+                onPressed: onDownload,
+                child: const Text(VoiceHelp.downloadLabel),
+              ),
+            ],
           ),
         ],
       ),

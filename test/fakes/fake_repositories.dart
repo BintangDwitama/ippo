@@ -11,6 +11,7 @@ import 'package:ippo/data/repositories/review_repository.dart';
 import 'package:ippo/data/repositories/settings_repository.dart';
 import 'package:ippo/data/repositories/speech_repository.dart';
 import 'package:ippo/data/repositories/unit_of_work.dart';
+import 'package:ippo/domain/models/japanese_voice.dart';
 import 'package:ippo/domain/models/appearance_mode.dart';
 import 'package:ippo/domain/models/backup_snapshot.dart';
 import 'package:ippo/domain/models/goal.dart';
@@ -356,16 +357,43 @@ class FakeSettingsRepository implements SettingsRepository {
 }
 
 class FakeSpeechRepository implements SpeechRepository {
-  FakeSpeechRepository({this.japaneseVoiceAvailable = true});
+  FakeSpeechRepository({bool japaneseVoiceAvailable = true})
+      : voice = japaneseVoiceAvailable
+            ? JapaneseVoice.ready
+            : JapaneseVoice.missing;
 
-  bool japaneseVoiceAvailable;
+  /// What the phone says about its Japanese voice; tests may change it.
+  JapaneseVoice voice;
+
+  /// Whether the phone has a voice download screen to open.
+  bool canOpenVoiceDownload = true;
+  int voiceDownloadsOpened = 0;
+  int voiceChecks = 0;
+  int prepared = 0;
 
   /// Every text passed to [speak], in order.
   final List<String> spoken = [];
   int stopCount = 0;
 
   @override
-  Future<bool> isJapaneseVoiceAvailable() async => japaneseVoiceAvailable;
+  Future<JapaneseVoice> getJapaneseVoice() async {
+    voiceChecks++;
+    return voice;
+  }
+
+  @override
+  Future<bool> isJapaneseVoiceAvailable() async => voice.canSpeak;
+
+  @override
+  Future<void> prepare() async {
+    prepared++;
+  }
+
+  @override
+  Future<bool> openVoiceDownload() async {
+    if (canOpenVoiceDownload) voiceDownloadsOpened++;
+    return canOpenVoiceDownload;
+  }
 
   @override
   Future<void> speak(String text) async {

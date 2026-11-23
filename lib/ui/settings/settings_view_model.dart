@@ -17,6 +17,7 @@ class SettingsViewModel extends ViewModel {
 
   final AppDependencies _deps;
   bool _isPermissionDenied = false;
+  bool _voiceDownloadUnavailable = false;
 
   SettingsUiState _uiState = const SettingsUiState();
   SettingsUiState get uiState => _uiState;
@@ -27,8 +28,10 @@ class SettingsViewModel extends ViewModel {
       dailyReviewCap: await _deps.settingsRepository.getDailyReviewCap(),
       reminderTime: await _deps.settingsRepository.getReminderTime(),
       isReminderPermissionDenied: _isPermissionDenied,
-      isJapaneseVoiceAvailable:
-          await _deps.speechRepository.isJapaneseVoiceAvailable(),
+      // Asked afresh each time: the learner may have just downloaded
+      // the voice.
+      japaneseVoice: await _deps.speechRepository.getJapaneseVoice(),
+      voiceDownloadUnavailable: _voiceDownloadUnavailable,
       appearanceMode: await _deps.settingsRepository.getAppearanceMode(),
       speechSpeed: await _deps.settingsRepository.getSpeechSpeed(),
     );
@@ -76,6 +79,14 @@ class SettingsViewModel extends ViewModel {
   Future<void> playSample() async {
     if (!_uiState.isJapaneseVoiceAvailable) return;
     await _deps.speechRepository.speak(speechSample);
+  }
+
+  /// Opens the phone's voice download screen. If the phone has none,
+  /// the row then explains where to look instead.
+  Future<void> openVoiceDownload() async {
+    final opened = await _deps.speechRepository.openVoiceDownload();
+    _voiceDownloadUnavailable = !opened;
+    await _load();
   }
 
   Future<void> disableReminder() async {

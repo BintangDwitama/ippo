@@ -179,6 +179,12 @@ Addresses are shown as selectable text. No `url_launcher`: it would be a new dep
 - **A word removed from the list stays in the database** → Harmless: learned ones keep working, unlearned ones are not offered.
 - **Share-alike data now ships inside the app** → The About screen and the repository notices give the required credit. The licence of the app's own code remains the owner's open decision and is not changed here.
 
+## Check on the phone
+
+2026-11-23, release build on the owner's phone, installed over the existing data after the owner exported a backup. The owner was asked to check that kana progress was intact, the home screen, a word lesson, how a few words sound, word cards in a review and the About screen, and reported: "seems all good". Nothing was reported to fix. The owner did not report on each point separately.
+
+The two open questions (whether five words a day feels right, whether three actions on the home screen stay clear) are left to a week of use.
+
 ## Migration Plan
 
 No database migration. On first launch after the update the word items are added; existing kana, cards, goals and settings are untouched. Backups written from then on are version 3.

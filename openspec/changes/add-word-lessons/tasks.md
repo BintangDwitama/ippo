@@ -54,5 +54,5 @@
 
 - [x] 8.1 The owner exports a backup before installing the new build
 - [x] 8.2 Run `flutter analyze` and `flutter test`; fix all issues; build and install the release
-- [ ] 8.3 The owner checks: existing kana progress is intact; a word lesson is offered and reads well; words are spoken correctly for a sample; word cards appear in a review; the home screen is clear; the About screen shows the dictionary date
-- [ ] 8.4 Record what the check found in design.md and fix what it turns up
+- [x] 8.3 The owner checks: existing kana progress is intact; a word lesson is offered and reads well; words are spoken correctly for a sample; word cards appear in a review; the home screen is clear; the About screen shows the dictionary date
+- [x] 8.4 Record what the check found in design.md and fix what it turns up

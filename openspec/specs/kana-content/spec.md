@@ -1,7 +1,8 @@
 # kana-content Specification
 
 ## Purpose
-TBD - created by archiving change add-kana-trainer. Update Purpose after archive.
+The kana the app teaches and what is known about each: the seeded set with readings, groups and mnemonics, the learner's own mnemonics, the kana grid, and how voiced kana, combinations and marks are presented.
+
 ## Requirements
 ### Requirement: Seeded kana set
 The system SHALL ship with 211 kana available without any network access: for each of hiragana and katakana, the 46 basic kana, the 25 voiced kana (including the 5 half-voiced), and the 33 combination kana; and three marks: the small っ in hiragana, and the small ッ and the long mark ー in katakana. Each kana SHALL have its character, its script, its group (basic, voiced, combination or mark), its row, its romaji reading or, for a mark, its name, its position in the teaching order, and a default mnemonic. Kana that share a reading within a script (for example じ and ぢ) SHALL both be present.

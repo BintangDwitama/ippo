@@ -1,7 +1,8 @@
 # learning-goals Specification
 
 ## Purpose
-TBD - created by archiving change add-kana-trainer. Update Purpose after archive.
+The learner's goal and daily rhythm: one active goal with a deadline and target accuracy, the daily quota of new kana it implies, the daily review cap, progress, the streak and the daily reminder.
+
 ## Requirements
 ### Requirement: One active SMART goal
 The system SHALL let the learner set one active goal consisting of a target set of kana, a target accuracy, and a deadline in days. The target set SHALL be one of: basic hiragana (46), basic katakana (46), both basic sets (92), voiced and combination hiragana with the hiragana mark (59), voiced and combination katakana with the katakana marks (60), or all kana (211). Each choice SHALL show how many kana it covers. On first launch the system SHALL offer the preset "all 46 hiragana at 90% accuracy within 14 days", which the learner can accept or adjust.

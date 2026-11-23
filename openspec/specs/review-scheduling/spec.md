@@ -1,7 +1,8 @@
 # review-scheduling Specification
 
 ## Purpose
-TBD - created by archiving change add-kana-trainer. Update Purpose after archive.
+The card model and its schedule: one card per item and question type, spaced repetition that decides when each card is due, the review history, and a scheduling algorithm that can be replaced.
+
 ## Requirements
 ### Requirement: Generic card model
 The system SHALL model a review card as a combination of a learning item and a prompt type, with its own scheduling state. The card model SHALL NOT be specific to kana, so that other item kinds can be added later without changing the scheduler.

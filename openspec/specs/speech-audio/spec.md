@@ -1,7 +1,8 @@
 # speech-audio Specification
 
 ## Purpose
-TBD - created by archiving change add-kana-trainer. Update Purpose after archive.
+Spoken Japanese in the app: speaking a kana or a word with the phone's Japanese voice, what happens when no voice is installed, the adjustable speaking speed, and an audio source that can be replaced.
+
 ## Requirements
 ### Requirement: Speak a kana
 The system SHALL be able to play the spoken sound of any kana using a Japanese voice, without a network connection when the device has an offline Japanese voice installed.
@@ -61,4 +62,19 @@ The chosen speed SHALL be stored on the device. It SHALL NOT be written to a bac
 #### Scenario: Importing a backup
 - **WHEN** the learner has selected Very slow and imports a backup file
 - **THEN** the speaking speed is still Very slow
+
+### Requirement: Speak a word
+The system SHALL be able to speak any word of the word list using a Japanese voice, at the learner's chosen speaking speed, without a network connection when the device has an offline Japanese voice installed. The word SHALL be spoken from its reading in kana, so that the pronunciation does not depend on how the voice reads kanji.
+
+#### Scenario: Play on request
+- **WHEN** the learner taps the audio control for the word 雨
+- **THEN** "ame" is spoken in a Japanese voice
+
+#### Scenario: Speed setting applies
+- **WHEN** the speaking speed is set to Very slow and a word is spoken
+- **THEN** it is spoken at that speed
+
+#### Scenario: New request interrupts
+- **WHEN** a word is being spoken and another sound is requested
+- **THEN** the first stops and the new one plays
 

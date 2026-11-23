@@ -1,7 +1,8 @@
 # kana-lessons Specification
 
 ## Purpose
-TBD - created by archiving change add-kana-trainer. Update Purpose after archive.
+How kana are introduced: lessons of whole rows in small batches, each kana presented with its mnemonic and sound, a check before the lesson counts, and the review cards a finished lesson creates.
+
 ## Requirements
 ### Requirement: Lessons introduce kana in small batches
 The system SHALL introduce new kana in lessons made of whole rows, of at most six kana. A lesson SHALL start with the kana not yet introduced from the next row in teaching order, and SHALL add following rows of the same script and group while the lesson stays at six kana or fewer. A lesson SHALL NOT mix scripts or groups.

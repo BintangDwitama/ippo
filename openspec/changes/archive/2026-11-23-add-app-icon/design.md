@@ -105,6 +105,12 @@ Once the app's night mode is forced, the app's configuration says dark or light 
 - **Launchers cache icons**, so the old icon may linger after an update → Clears on reboot or reinstall; noted for the phone check.
 - **Glyph rendering differs slightly between Flutter versions** → The images are committed; regeneration is deliberate.
 
+## Check on the phone
+
+2026-11-23, release build on the owner's phone (Android 16). The owner was shown the rendered icon and asked to check: the icon on the home screen and in the app drawer; that Automatic still follows the phone when it switches between light and dark; the launch screen for Night, Daylight and Paper; and the tinted icon. The owner reported: "phone checks passed", and asked for no change to the mark. The owner did not report on each point separately.
+
+That Automatic still follows the phone was the point decision 5 depended on, since the documentation does not say which value returns the app to the phone's mode. It rests on the owner's check, not on anything seen from the development computer.
+
 ## Migration Plan
 
 None for data. Installing the update replaces the icon and launch screen. Rollback is reverting the commit.

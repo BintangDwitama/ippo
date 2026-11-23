@@ -7,7 +7,7 @@
 
 - [x] 2.1 Write `tool/icon/generate_icon_test.dart`: render 歩 from the bundled Klee One font, centred by its ink, to the foreground images and the legacy icons at five densities
 - [x] 2.2 Run it; add `mipmap-anydpi-v26/ic_launcher.xml` with background, foreground and monochrome layers and the background colour resource
-- [ ] 2.3 Show the owner the rendered icon (full size and at launcher size) and adjust size or weight if asked
+- [x] 2.3 Show the owner the rendered icon (full size and at launcher size) and adjust size or weight if asked
 - [x] 2.4 Add `test/tool/icon_files_test.dart`: files exist at the right sizes, the foreground's ink lies inside the safe circle, the XML names all three layers, and regenerating gives the same pixels
 
 ## 3. Launch screen
@@ -26,6 +26,6 @@
 ## 5. Checks on the phone
 
 - [x] 5.1 Run `flutter analyze` and `flutter test`; build and install the release
-- [ ] 5.2 Verify that reporting the night mode does not change the app's look: Automatic still follows the phone in both modes; Daylight, Night and Paper show correctly with the phone in either mode. If not, stop and revisit decision 5
-- [ ] 5.3 The owner checks: the icon on the home screen and in the app drawer, with themed icons on and off; the launch screen for each appearance; no white flash in Night
-- [ ] 5.4 Record what the check found in design.md, fix what it turns up, and update the README
+- [x] 5.2 Verify that reporting the night mode does not change the app's look: Automatic still follows the phone in both modes; Daylight, Night and Paper show correctly with the phone in either mode. If not, stop and revisit decision 5
+- [x] 5.3 The owner checks: the icon on the home screen and in the app drawer, with themed icons on and off; the launch screen for each appearance; no white flash in Night
+- [x] 5.4 Record what the check found in design.md, fix what it turns up, and update the README

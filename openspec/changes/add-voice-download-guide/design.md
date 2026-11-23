@@ -98,6 +98,12 @@ Button: "Download voice". On failure to open, a short message with the path: Set
 
 **The owner's phone (task 1.3)**, Samsung SM-S731B, Android 16, read with a temporary build that was removed afterwards: the engine is Google's (`com.google.android.tts`); Japanese is available and installed; of 474 voices, 9 are Japanese: `ja-JP-language` (offline, the language default), four `-local` voices (offline) and four `-network` voices. So this phone is in the ready state, the engine's default is already offline, and the app asks for no voice by name.
 
+## Known gap, deferred by the owner
+
+Reported by the owner on 2026-11-23: on some phones from Chinese makers the speech engine does not offer Japanese at all. That is the missing state, and this change does not help there: the download button opens the maker's own screen, which has no Japanese to download. The phone was not examined; its maker, model and whether it has the Play Store are not known.
+
+Options discussed and deferred as an edge case: using another engine already installed on the phone that does speak Japanese; telling the learner to install Google's speech engine; shipping audio inside the app, the only option that works on a phone without the Play Store, which still needs a source of audio that may be redistributed (generating it with an open-source speech program was raised and not researched).
+
 ## Risks / Trade-offs
 
 - **The diagnosis is wrong** and the other phone's delay has another cause → Task 1.1 asks the owner for the airplane-mode check before building. The change is still worthwhile without it (the silent online-only state is real), but the proposal's motivation is then weaker and that is said plainly.

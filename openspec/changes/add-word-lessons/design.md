@@ -62,7 +62,11 @@ A `WordSeedLoader` parses the asset into `SeedItem`s and calls the existing `syn
 
 Launch must not visibly slow down. The target on the owner's phone: first launch after update under one second for the sync, later launches under 100 ms. If parsing 240 KB of JSON on the UI thread drops frames, it moves to an isolate (`compute`). Measured in task 3.5 before deciding.
 
-On the development computer, against a database file: the first sync (1,291 inserts) takes about 100 ms including 25 ms to parse; a later launch with nothing to change takes 20 to 35 ms; reading all 1,502 items takes 17 ms. A phone is slower; the app prints the time in debug and profile builds (`Seed sync took N ms`) for the on-phone check.
+On the development computer, against a database file: the first sync (1,291 inserts) takes about 100 ms including 25 ms to parse; a later launch with nothing to change takes 20 to 35 ms; reading all 1,502 items takes 17 ms. 
+
+On the owner's phone (Samsung SM-S731B, profile build, measured 2026-11-23 with temporary probes that were removed afterwards), a launch with nothing to change: loading the file 2 to 20 ms, parsing 3 ms, the sync 8 ms (reading the rows and comparing; no row rewritten). Opening the database and syncing the kana, which the app did before this change, takes 90 to 150 ms. No isolate is needed.
+
+A first reading suggested 400 to 1,700 ms. That was a single stall of about 300 ms that the phone has during app start: it landed in a different step on each launch, and a loop of trivial `SELECT 1` queries run in the same window hit it too (slowest query 277 to 340 ms, the rest well under 1 ms). It is not caused by the word list and was not investigated further. The first launch after the update, which inserts the 1,291 words, was not timed separately: the probes went in after it had already happened.
 
 Words dropped from a later list stay in the database (the sync never removes). A learned word keeps its cards; an unlearned one would still be offered. To prevent that, the loader's set of current keys is kept in memory and the lesson chooser only offers words in it (decision 4).
 

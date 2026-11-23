@@ -17,7 +17,7 @@
 - [x] 3.2 Implement `WordSeedLoader`: parse and validate the file's header and words into seed items; expose the list's dictionary date and current keys
 - [x] 3.3 Make `syncSeedItems` write new items that have no mnemonic in one batch (it already read once, compared in memory and used one transaction)
 - [x] 3.4 Run the word seed at startup after the kana seed; wire it in `app_dependencies.dart`
-- [ ] 3.5 Measure the sync on the phone (first launch after update, and a later launch); move parsing to an isolate if it drops frames; record the numbers in design.md
+- [x] 3.5 Measure the sync on the phone (first launch after update, and a later launch); move parsing to an isolate if it drops frames; record the numbers in design.md
 - [x] 3.6 Tests: the real bundled file parses; every word's kana keys exist in the kana seed; sync is idempotent, updates a changed meaning, adds a new word, never removes, never touches learner data
 
 ## 4. Lessons
@@ -52,7 +52,7 @@
 
 ## 8. Checks on the phone
 
-- [ ] 8.1 The owner exports a backup before installing the new build
-- [ ] 8.2 Run `flutter analyze` and `flutter test`; fix all issues; build and install the release
+- [x] 8.1 The owner exports a backup before installing the new build
+- [x] 8.2 Run `flutter analyze` and `flutter test`; fix all issues; build and install the release
 - [ ] 8.3 The owner checks: existing kana progress is intact; a word lesson is offered and reads well; words are spoken correctly for a sample; word cards appear in a review; the home screen is clear; the About screen shows the dictionary date
 - [ ] 8.4 Record what the check found in design.md and fix what it turns up

@@ -1,5 +1,4 @@
 import 'package:drift_flutter/drift_flutter.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -37,7 +36,6 @@ Future<void> main() async {
   final database = AppDatabase(driftDatabase(name: 'ippo'));
   final itemRepository = DriftItemRepository(database);
   final settingsRepository = DriftSettingsRepository(database);
-  final seedWatch = Stopwatch()..start();
   await KanaSeedLoader(
     itemRepository: itemRepository,
     loadSeedJson: () => rootBundle.loadString(KanaSeedLoader.assetPath),
@@ -47,10 +45,6 @@ Future<void> main() async {
     itemRepository: itemRepository,
     loadSeedJson: () => rootBundle.loadString(WordSeedLoader.assetPath),
   ).seed();
-  // Startup waits for this, so its cost is worth seeing while developing.
-  if (!kReleaseMode) {
-    debugPrint('Seed sync took ${seedWatch.elapsedMilliseconds} ms');
-  }
 
   final dependencies = AppDependencies(
     itemRepository: itemRepository,

@@ -102,6 +102,8 @@ Button: "Download voice". On failure to open, a short message with the path: Set
 
 2026-11-23. Asked to check the path for a voice that is not downloaded (the notice, the Download voice button, the notice clearing after the download), the owner reported: "the download doing well". Which phone this was on, and each step separately, were not reported.
 
+The check of the owner's own phone (task 5.2: sound as before, a prompt first sound, settings showing the voice as downloaded, no notice) was asked for and not reported; the owner archived the change without answering it. That task is left unticked. What is known for that phone: its engine reports Japanese as installed with an offline default voice, so the app asks for no voice by name there, and the automated tests cover that case.
+
 ## Known gap, deferred by the owner
 
 Reported by the owner on 2026-11-23: on some phones from Chinese makers the speech engine does not offer Japanese at all. That is the missing state, and this change does not help there: the download button opens the maker's own screen, which has no Japanese to download. The phone was not examined; its maker, model and whether it has the Play Store are not known.

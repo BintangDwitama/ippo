@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The Daylight theme's blue. Keep in step with tool/icon/icon_renderer.dart. -->
+    <color name="ic_launcher_background">#2459E0</color>
+    <!-- Behind the icon while the app starts. A near-white that sits
+         between the Daylight and Paper pages. -->
+    <color name="launch_background">#F2F2F0</color>
+    <!-- The mark on the launch screen before Android 12. -->
+    <color name="launch_mark">#2459E0</color>
+</resources>

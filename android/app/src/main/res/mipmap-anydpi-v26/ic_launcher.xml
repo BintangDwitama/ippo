@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The app icon in layers, so a launcher can cut it to its own shape.
+     The images are written by tool/icon/generate_icon_test.dart. -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@color/ic_launcher_background" />
+    <foreground android:drawable="@mipmap/ic_launcher_foreground" />
+    <!-- Only its shape is used: Android 13 and later tint it to match
+         the wallpaper when themed icons are on. -->
+    <monochrome android:drawable="@mipmap/ic_launcher_foreground" />
+</adaptive-icon>

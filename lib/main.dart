@@ -14,7 +14,9 @@ import 'package:ippo/data/repositories/drift_review_repository.dart';
 import 'package:ippo/data/repositories/drift_settings_repository.dart';
 import 'package:ippo/data/repositories/drift_unit_of_work.dart';
 import 'package:ippo/data/repositories/file_picker_backup_file_repository.dart';
+import 'package:ippo/data/repositories/launch_appearance_repository.dart';
 import 'package:ippo/data/repositories/local_notification_reminder_repository.dart';
+import 'package:ippo/data/repositories/method_channel_launch_appearance_repository.dart';
 import 'package:ippo/data/repositories/tts_speech_repository.dart';
 import 'package:ippo/data/seed/kana_seed_loader.dart';
 import 'package:ippo/data/seed/word_seed_loader.dart';
@@ -70,6 +72,7 @@ Future<void> main() async {
     IppoApp(
       dependencies: dependencies,
       initialAppearanceMode: appearanceMode,
+      launchAppearance: const MethodChannelLaunchAppearanceRepository(),
     ),
   );
 
@@ -84,12 +87,17 @@ class IppoApp extends StatefulWidget {
     super.key,
     required this.dependencies,
     this.initialAppearanceMode = AppearanceMode.automatic,
+    this.launchAppearance,
   });
 
   final AppDependencies dependencies;
 
   /// The stored appearance, shown from the first frame.
   final AppearanceMode initialAppearanceMode;
+
+  /// Where the launch screen's look is reported; null in tests that do
+  /// not care.
+  final LaunchAppearanceRepository? launchAppearance;
 
   @override
   State<IppoApp> createState() => _IppoAppState();
@@ -100,6 +108,7 @@ class _IppoAppState extends State<IppoApp> {
   late final AppViewModel _viewModel = AppViewModel(
     widget.dependencies.settingsRepository,
     initialAppearanceMode: widget.initialAppearanceMode,
+    launchAppearance: widget.launchAppearance,
   );
 
   @override

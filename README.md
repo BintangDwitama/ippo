@@ -7,6 +7,12 @@ mnemonics and audio, spaced-repetition reviews, and a goal to keep pace.
 Built with Flutter, Android first. Everything is stored on the device and
 works offline.
 
+The icon is the character 歩 ("step", from the name 一歩). While the app
+starts it is shown on a light or dark screen that matches the appearance
+chosen in the app (Android 12 and later; Paper uses the light one). The
+icon images are drawn from the bundled font by
+`flutter test tool/icon/generate_icon_test.dart`.
+
 The look is chosen in Settings > Appearance: Automatic (Daylight by day,
 Night in dark mode), Daylight, Night or Paper. All themes share one layout.
 
@@ -116,6 +122,7 @@ assets/seed/kana.json     the 211 kana with readings, groups, rows and mnemonics
 assets/fonts/             bundled fonts (SIL Open Font License) and their licences
 data/words/               the beginner word list, built from JMdict; words.json is bundled
 tool/words/               the script that builds it
+tool/icon/                draws the app icon from the kana font
 openspec/                 specs, design and tasks for each change
 ```
 

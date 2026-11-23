@@ -29,12 +29,12 @@ Decisions made with the owner: one icon that does not change with the theme; a t
 
 歩 from `assets/fonts/KleeOne-SemiBold.ttf`, white (`#FFFFFF`) on the Daylight blue (`#2459E0`). One character, because two (一歩) halve in size inside the adaptive icon's safe zone and blur at small sizes. Klee One, because it is the lettering the app already uses for its name and its kana.
 
-The adaptive icon canvas is 108 × 108 dp, of which only the central 66 dp circle is guaranteed visible. The character is sized so its ink fits within about 56 dp, leaving margin inside the safe circle, and is centred by its ink bounds, not its font metrics, since a glyph's box is rarely centred on its ink.
+The adaptive icon canvas is 108 × 108 dp, of which only the central 66 dp circle is guaranteed visible. The character is sized so its ink is 46 dp on its longer side, which keeps even its corners inside the safe circle, and is centred by its ink bounds, not its font metrics, since a glyph's box is rarely centred on its ink.
 
 ### 2. Icon files
 
 - `mipmap-anydpi-v26/ic_launcher.xml`: `<adaptive-icon>` with `background` a colour resource, `foreground` an image, and `monochrome` the same image (the system uses only its alpha).
-- `mipmap-*/ic_launcher_foreground.png` at five densities (108 dp: 108, 162, 216, 324, 432 px), white mark on transparent.
+- `mipmap-*/ic_launcher_foreground.png` at five densities (108 dp: 108, 162, 216, 324, 432 px), white mark on transparent. The mark's ink is 46 dp on its longer side: a square of that size has its corners just inside the 66 dp safe circle.
 - `mipmap-*/ic_launcher.png` at five densities (48 dp) for Android 7: the mark on a blue rounded square, replacing the Flutter images.
 - `values/colors.xml`: `ic_launcher_background`.
 
@@ -42,7 +42,7 @@ Images, not a vector drawable. A vector would be a single crisp file, but turnin
 
 ### 3. Generating the artwork
 
-`tool/icon/generate_icon_test.dart`, run with `flutter test tool/icon/generate_icon_test.dart`. It loads the bundled font, lays out the character with Flutter's own text engine, draws each image on a canvas and writes the PNG files into `android/app/src/main/res/`. It is written as a test file only because `flutter test` is the simplest way to get Flutter's text and image engine without a device; it is not part of the normal test run (it lives under `tool/`, not `test/`).
+`tool/icon/generate_icon_test.dart`, run with `flutter test tool/icon/generate_icon_test.dart`, with the drawing itself in `tool/icon/icon_renderer.dart` so that the checking test can draw the icon again. It also writes previews to `build/icon_preview/` (not committed). It loads the bundled font, lays out the character with Flutter's own text engine, draws each image on a canvas and writes the PNG files into `android/app/src/main/res/`. It is written as a test file only because `flutter test` is the simplest way to get Flutter's text and image engine without a device; it is not part of the normal test run (it lives under `tool/`, not `test/`).
 
 A normal test (`test/tool/icon_files_test.dart`) checks the committed files: each exists at the expected pixel size, the foreground has transparent corners and ink only inside the safe circle, and the adaptive icon XML names all three layers.
 
@@ -70,7 +70,9 @@ Android 12 added `UiModeManager.setApplicationNightMode`, which stores a night m
 | Night | yes |
 | Paper | no |
 
-The exact constant for "follow the system" is to be confirmed from the platform documentation in the first task (the API offers `MODE_NIGHT_AUTO` and `MODE_NIGHT_CUSTOM` beside yes and no, and which of them clears an override is easy to get wrong).
+The documentation (read 2026-11-23) confirms that the method accepts `MODE_NIGHT_AUTO`, `MODE_NIGHT_CUSTOM`, `MODE_NIGHT_NO` and `MODE_NIGHT_YES`, that the mode "is persisted for this application until it is either modified by the application, the user clears the data for the application, or this application is uninstalled", and that a change "will result in a configuration change (and potentially an Activity lifecycle event)". The activity already declares `uiMode` among the configuration changes it handles itself, so it is not restarted.
+
+The documentation does **not** say which value returns the app to following the phone. The implementation sends `MODE_NIGHT_AUTO` for Automatic, on the understanding that the system treats anything other than yes or no as "no setting of the app's own". That understanding is from memory of the platform's behaviour, not from the documentation, and is what the check on the phone (task 5.2) is for.
 
 Wiring, in the project's layers:
 
